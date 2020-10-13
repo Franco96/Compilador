@@ -1,0 +1,82 @@
+
+<Inicial> ::= <Clase> <ListaClases>  //eliminacion de recursion y factorizacion
+
+<ListaClases> ::= <Clases> <ListaClases> | epsilon
+
+<Clase> ::= class idClase <Herencia> { <ListaMiembros> }
+
+<Herencia> ::= extends idClase | epsilon
+
+<ListaMiembros> ::= <Miembro> <ListaMiembros> | epsiolon
+
+<miembro> ::= <atributo>|<Constructor>|<metodo> 
+
+<atributo> ::= <visibilidad> <tipo> <ListaDeAtrs> ;
+
+<visibilidad> ::= public | private
+
+<tipo> ::= boolean | char | int |String | idClase
+
+<ListaDeAtribs> ::= idMetVar <ListaDeAtribsAux>
+
+<ListaAtribsAux> ::= , <ListaDeAtrs> | epsilon
+
+<Constructor> ::= idClase <ArgsFormales> <bloque>
+
+<ArgsFormales> ::= ( <listaArgsFormalesOVacio>)
+
+<listaArgsFormalesOVacio> ::= <listaArgsFormales> | epsilon
+
+<listaArgsFormales>::= <ArgFormal> <listaArgsFormalesAux> 
+<listaArgsFormalesAux> ::= ,<listaArgsFormales> | epsilon 
+
+<ArgFormal>:<Tipo> idMetVar
+
+<bloque> ::= { <listaSentencias>}
+
+
+<listaSentencias>::= <sentencia> <listaSentencias> | epsilon
+
+<sentencia> ::= ;
+
+
+<sentencia> ::= <acceso> <asignacionOLlamada>; 
+
+
+
+
+
+
+
+
+
+<asignacionOLlamada>:: = <tipoDeAsignacion><Expresion> | epsilon    //aca abarca asignacion o llamada si es epsilon
+
+
+
+
+<acceso> ::= this | idMetVar <accesoMetOVar> | static idClase . idMetVar (listaExpsOVacio) | new idClase (listaExpsOVacio) | (expresion)
+
+
+<accesoMetOVar> ::= (listaExpOVacio)| epsilon //aca abarca acceso a metodo o variable si es epsilon
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

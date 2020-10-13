@@ -31,7 +31,7 @@ public class AnalizadorSintactico {
 	}
 	
 	private boolean esIgual(String token){
-		return Arrays.asList(token).contains(tokenActual.getToken());
+		return token.equals(tokenActual.getToken());
 	}
 	
 	
@@ -269,6 +269,71 @@ public class AnalizadorSintactico {
 
 	}
 	
+	private void sentencia() throws ErrorSintactico, IOException, ErrorLexico{
+		
+				switch(tokenActual.getToken()){
+		
+					case "T_PyC":
+										match("T_PyC");
+										break;
+					case "T_This":
+					case "idMetVar":
+					case "T_Static":
+					case "T_New":
+					case "T_parenIni":
+										
+										acceso();
+										asignacionOLlamada();
+										match("T_PyC");
+										break;
+				}
+		
+	}
+	
+	
+	private void acceso() throws ErrorSintactico, IOException, ErrorLexico{
+				
+				switch(tokenActual.getToken()){
+				
+					case "T_This":
+									match("T_This");
+									break;
+					
+					case "idMetVar":			
+									
+									match("idMetVar");
+									accesoMetOVar();
+									break;
+					
+					case "T_Static":
+									
+									match("T_Static");
+									match("idClase");
+									match("T_punto");
+									match("idMetVar");
+									match("T_parenIni");
+									listaExpsOVacio();
+									match("T_parenFin");
+									break;
+					
+					case "T_New":	
+									
+									match("T_New");
+									match("idClase");
+									match("T_parenIni");
+									listaExpsOVacio();
+									match("T_parenFin");
+									break;
+					
+					case "T_parenIni":
+									
+									match("T_parenIni");
+									expresion();
+									match("T_parenFin");
+									break;
+					
+				}
+	}
 	
 	
 	
