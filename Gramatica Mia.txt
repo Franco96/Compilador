@@ -1,0 +1,97 @@
+
+<Inicial> ::= <Clase> <ListaClases>  //eliminacion de recursion y factorizacion
+
+<ListaClases> ::= <Clases> <ListaClases> | epsilon
+
+<Clase> ::= class idClase <Herencia> { <ListaMiembros> }
+
+<Herencia> ::= extends idClase | epsilon
+
+<ListaMiembros> ::= <Miembro> <ListaMiembros> | epsiolon
+
+<miembro> ::= <atributo>|<Constructor>|<metodo> 
+
+<atributo> ::= <visibilidad> <tipo> <ListaDeAtrs> ;
+
+<visibilidad> ::= public | private
+
+<tipo> ::= boolean | char | int |String | idClase
+
+<ListaDeAtribs> ::= idMetVar <ListaDeAtribsAux>
+
+<ListaDeAtribsAux> ::= , <ListaDeAtribs> | epsilon
+
+<Constructor> ::= idClase <ArgsFormales> <bloque>
+
+<ArgsFormales> ::= ( <listaArgsFormalesOVacio>)
+
+<listaArgsFormalesOVacio> ::= <listaArgsFormales> | epsilon
+
+<listaArgsFormales>::= <ArgFormal> <listaArgsFormalesAux> 
+
+<listaArgsFormalesAux> ::= ,<listaArgsFormales> | epsilon 
+
+<ArgFormal>:<Tipo> idMetVar
+
+<bloque> ::= { <listaSentencias>}
+
+
+<listaSentencias>::= <sentencia> <listaSentencias> | epsilon
+
+
+
+<sentencia> ::= ;
+<sentencia> ::= <acceso> <asignacionOLlamada>; 
+
+
+
+
+
+
+
+
+
+
+<asignacionOLlamada>:: = <tipoDeAsignacion><Expresion> | epsilon    //aca abarca asignacion o llamada si es epsilon
+
+
+
+
+<acceso> ::= this <encadenado>| idMetVar <accesoMetOVar> <encadenado> | static idClase . idMetVar (listaExpsOVacio) <encadenado>| new idClase (listaExpsOVacio) <encadenado>| (expresion) <encadenado>
+
+
+<accesoMetOVar> ::= (listaExpOVacio)| epsilon //aca abarca acceso a metodo o variable si es epsilon
+
+
+
+<listaExpsOVacio> :: = <listaExps> | epsilon 
+
+
+<listaExps> ::= <expresion> <listaExpsAux>
+<listaExpsAux> ::= , <listaExps> | epsilon
+
+
+--------------EXPRESION---------------------------------------------------
+
+<ExpresionOVacio> ::= <Expresion> | epsilon
+
+
+<Expresion> :: = <ExpresionUnaria>  <expresionAux>
+
+<expresionAux> :: = <operadorBinario> <ExpresionUnaria> <expresionAux> | epsilon
+
+	
+
+<ExpresionUnaria> ::= + <Operando> | - <Operando> | ! <Operando> | <Operando>
+
+<Operando> ::= null | true | false | litEntero | charlit | stringlit | <acceso>
+
+
+
+
+
+
+
+
+
+

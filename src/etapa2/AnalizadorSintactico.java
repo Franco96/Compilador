@@ -103,11 +103,12 @@ public class AnalizadorSintactico {
 					case "idClase":
 										constructor();
 										break;	
-					case "T_Static":
+				
+				/*	case "T_Static":
 					case "T_Dynamic":
 										metodo();
 										break;
-					
+					*/
 					default: 
 										throw new ErrorSintactico("Inicio Miembro");
 			
@@ -223,13 +224,15 @@ public class AnalizadorSintactico {
 			
 			argFormal();
 			listaArgsFormalesAux();
+			
+	
 	}
 	
 	
 	private void listaArgsFormalesAux() throws ErrorSintactico, IOException, ErrorLexico{
 		
-			if(esIgual("T_Coma")){
-				match("T_Coma");
+			if(esIgual("T_coma")){
+				match("T_coma");
 				listaArgsFormales();
 			}else{
 				 //epsilon no se hace nada
@@ -291,6 +294,26 @@ public class AnalizadorSintactico {
 	}
 	
 	
+	
+	private void asignacionOLlamada() throws ErrorSintactico, IOException, ErrorLexico{
+		 
+			if(Arrays.asList("op=","op+=","op-=").contains(tokenActual.getToken())){
+				
+					match(tokenActual.getToken());
+					expresion();
+			}else{
+				//epsilon no se hace nada (aca es el caso de una llamada)
+			}
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 	private void acceso() throws ErrorSintactico, IOException, ErrorLexico{
 				
 				switch(tokenActual.getToken()){
@@ -333,11 +356,143 @@ public class AnalizadorSintactico {
 									break;
 					
 				}
+				
+				
+				//encadenado();
 	}
 	
 	
 	
 	
 	
+	private void accesoMetOVar() throws ErrorSintactico, IOException, ErrorLexico{
+		
+		
+		if(esIgual( "T_parenIni")){
+			
+				match("T_parenIni");
+				listaExpsOVacio();
+				match("T_parenFin");
+		}else{
+			//epsilon aca seria variable
+		}
+	}
 	
+	
+	private void listaExpsOVacio() throws ErrorSintactico, IOException, ErrorLexico{
+		
+		
+		if(Arrays.asList("op+","op-","op!","LitNull","LitBoolean","LitEntero","LitCaracter","LitString"
+				,"T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
+
+			listaExprs();
+		
+		}else{
+			//epsilon no hago nada
+		}
+	}
+	
+	private void listaExprs() throws ErrorSintactico, IOException, ErrorLexico{
+		
+		expresion();
+		listaExprsAux();
+		
+	}
+	
+	private void listaExprsAux() throws ErrorSintactico, IOException, ErrorLexico{
+		
+		if(esIgual("T_coma")){
+			match("T_coma");
+			listaExprs();
+		}else{
+			//epsilon no se hace nada
+		}
+		
+		
+	}
+	
+	
+	
+	
+	//----------------Metodos para manejar la parte de expresion-------------------------
+	
+	
+	
+	private void expresionOVacio() throws ErrorSintactico, IOException, ErrorLexico{
+		
+		if(Arrays.asList("op+","op-","op!","LitNull","LitBoolean","LitEntero","LitCaracter","LitString"
+						,"T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
+		
+				expresion();
+		
+		}else{
+					
+				//epsilon no se hace nada
+		}
+	
+	}
+	
+	
+	
+	private void expresion() throws ErrorSintactico, IOException, ErrorLexico{
+		
+				expresionUnaria();
+				expresionAux();                    
+				
+	}
+	
+	private void expresionAux() throws ErrorSintactico, IOException, ErrorLexico{
+	
+		if(Arrays.asList("op+","op-","op==","op!=","op<","op>","op<=","op>=","op*","op/","op%","opOR","opAND").contains(tokenActual.getToken())){
+					
+			match(tokenActual.getToken()); //operador binario
+			expresionUnaria();
+			expresionAux();
+		}else{
+			
+			//epsilon no se hace nada
+		}
+		
+	}
+	
+	
+	
+	
+	private void expresionUnaria() throws ErrorSintactico, IOException, ErrorLexico{
+		
+			
+			if(Arrays.asList("op+","op-","op!").contains(tokenActual.getToken())){
+					
+						match(tokenActual.getToken());
+						operando();
+						
+			}else if(Arrays.asList("LitNull","LitBoolean","LitEntero","LitCaracter","LitString"
+					,"T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
+					
+						operando();
+			
+			}else{
+					throw new ErrorSintactico("");
+			}
+		
+	}
+	
+	
+	private void operando() throws ErrorSintactico, IOException, ErrorLexico{
+		
+		if(Arrays.asList("LitNull","LitBoolean","LitEntero","LitCaracter","LitString").contains(tokenActual.getToken())){
+				
+						match(tokenActual.getToken());
+						
+		}else if(Arrays.asList("T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
+						
+						acceso();
+		}else{
+					
+						throw new ErrorSintactico("");
+		}
+		
+	}
+	
+	//------------------------------------------------------------------------------------
 }
