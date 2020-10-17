@@ -7,7 +7,7 @@
 
 <Herencia> ::= extends idClase | epsilon
 
-<ListaMiembros> ::= <Miembro> <ListaMiembros> | epsiolon
+<ListaMiembros> ::= <Miembro> <ListaMiembros> | epsilon
 
 <miembro> ::= <atributo>|<Constructor>|<metodo> 
 
@@ -42,8 +42,25 @@
 
 <sentencia> ::= ;
 <sentencia> ::= <acceso> <asignacionOLlamada>; 
+<Sentencia> ::= <Tipo> <ListaDecVars> ;
 
 
+<Sentencia> ::= if ( <Expresion> ) <Sentencia> <ConOSinElse>
+
+<Sentencia> ::= while ( <Expresion> ) <Sentencia>
+
+<Sentencia> ::= <Bloque>
+<Sentencia> ::= return <ExpresionOVacio> ;
+
+
+
+
+<ConOSinElse>::= else <Sentencia> | epsilon
+
+
+<ListaDecVars> ::= idMetVar <ListaDecVarsAux>
+
+<ListaDecVarsAux> :: = , <ListaDecVars> | epsilon
 
 
 
@@ -69,6 +86,17 @@
 
 <listaExps> ::= <expresion> <listaExpsAux>
 <listaExpsAux> ::= , <listaExps> | epsilon
+
+
+
+<Encadenado> ::= . idMetVar <accesoMetOVar> <Encadenado> | epsilon
+
+
+<Metodo> ::= static <TipoMetodo> idMetVar <ArgsFormales> <Bloque> | dynamic <TipoMetodo> idMetVar <ArgsFormales> <Bloque>
+<TipoMetodo> ::= <Tipo> | void
+
+
+
 
 
 --------------EXPRESION---------------------------------------------------
