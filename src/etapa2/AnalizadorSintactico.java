@@ -9,7 +9,6 @@ import etapa1.*;
 
 public class AnalizadorSintactico {
 	
-	
 
 	private AnalizadorLexico aLex;	
 	private Token tokenActual;
@@ -23,7 +22,6 @@ public class AnalizadorSintactico {
 	}
 	
 	
-
 	private void match(String token,String esperaba) throws ErrorSintactico, IOException, ErrorLexico{
 		if (token.equals(tokenActual.getToken())) 
 			
@@ -41,6 +39,13 @@ public class AnalizadorSintactico {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
 	private void inicial() throws ErrorSintactico, IOException, ErrorLexico{
 			clase();
 			listaClases();
@@ -53,8 +58,12 @@ public class AnalizadorSintactico {
 		 if(Arrays.asList("T_Class").contains(tokenActual.getToken())){
 			 clase();
 			 listaClases();
-		 }else{
+		 }else if(esIgual("EOF")){
 			 //epsilon no se hace nada
+		 }else{
+			 throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba palabra clave class se encontro \""+tokenActual.getLexema()+"\""
+						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+													tokenActual.getNroLinea()+"]");
 		 }
 		
 	}
@@ -76,8 +85,12 @@ public class AnalizadorSintactico {
 			match("T_Extends","palabra clave extends");
 			match("idClase","identificador de clase");
 		}
-		else{
+		else if(esIgual("T_llavesIni")){
 			//no hago nada epsilon
+		}else{
+			throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba palabra clave extends se encontro \""+tokenActual.getLexema()+"\""
+					+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+												tokenActual.getNroLinea()+"]");
 		}
 		
 		
@@ -119,9 +132,6 @@ public class AnalizadorSintactico {
 										metodo();
 										break;
 					
-					default: 
-										throw new ErrorSintactico("Inicio Miembro");
-			
 			
 			}
 	}
@@ -129,7 +139,7 @@ public class AnalizadorSintactico {
 	
 	private void atributo()throws ErrorSintactico, IOException, ErrorLexico{
 		
-		visibilidad();
+		match(tokenActual.getToken(),"public o private");  //matcheo con public o private
 		tipo();
 		listaDeAtribs();
 		match("T_PyC",";");
@@ -167,14 +177,7 @@ public class AnalizadorSintactico {
 	}
 	
 	
-	private void visibilidad()throws ErrorSintactico, ErrorLexico, IOException{
 	
-		if(esIgual("T_Public"))
-			match("T_Public","palabra clave public");
-		else
-			match("T_Private","palabra clave private");		
-		
-	}
 	
 	private void tipo()throws ErrorSintactico, ErrorLexico, IOException{
 			
@@ -202,10 +205,11 @@ public class AnalizadorSintactico {
 						break;
 
 					default: 
+							System.out.println("La capturo acaaaa en tipo");
 							throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un tipo primitivo o identificador de clase se encontro \""+tokenActual.getLexema()+"\""
 								+"\n\n[Error:"+tokenActual.getLexema()+"|"+
 									tokenActual.getNroLinea()+"]");
-
+							
 
 				}
 		
@@ -225,8 +229,12 @@ public class AnalizadorSintactico {
 			if(esIgual("T_coma")){
 				match("T_coma",",");
 				listaDeAtribs();
-			}else{
+			}else if (esIgual("T_PyC")){
 				 //epsilon no se hace nada
+			}else{
+				throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba coma (,) se encontro \""+tokenActual.getLexema()+"\""
+						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+							tokenActual.getNroLinea()+"]");
 			}
 				
 	}
@@ -248,8 +256,13 @@ public class AnalizadorSintactico {
 		 if(Arrays.asList("T_Boolean","T_Char","idClase","T_Int","T_String").contains(tokenActual.getToken()))
 				
 			 	listaArgsFormales();
-		 else{
+		 else if(esIgual("T_parenFin")){
 			 //epsilon no se hace nada
+		 }else{
+			 throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un tipo de dato primitivo o identificador de clase"
+			 		+ " se encontro \""+tokenActual.getLexema()+"\""
+						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+													tokenActual.getNroLinea()+"]");
 		 }
 		
 		

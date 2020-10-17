@@ -1,5 +1,4 @@
-
-<Inicial> ::= <Clase> <ListaClases>  //eliminacion de recursion y factorizacion
+<Inicial> ::= <Clase> <ListaClases> eof //eliminacion de recursion y factorizacion
 
 <ListaClases> ::= <Clases> <ListaClases> | epsilon
 
@@ -11,9 +10,12 @@
 
 <miembro> ::= <atributo>|<Constructor>|<metodo> 
 
-<atributo> ::= <visibilidad> <tipo> <ListaDeAtrs> ;
 
-<visibilidad> ::= public | private
+
+
+
+
+<atributo> ::= public <tipo> <ListaDeAtribs> ;| private  <tipo> <ListaDeAtrs> ;
 
 <tipo> ::= boolean | char | int |String | idClase
 
@@ -26,6 +28,11 @@
 <ArgsFormales> ::= ( <listaArgsFormalesOVacio>)
 
 <listaArgsFormalesOVacio> ::= <listaArgsFormales> | epsilon
+
+
+
+
+--------------------------HASTA ACA TENGO CHEQUEADO-------------------------------------------
 
 <listaArgsFormales>::= <ArgFormal> <listaArgsFormalesAux> 
 
