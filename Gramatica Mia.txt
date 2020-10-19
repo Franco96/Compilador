@@ -30,37 +30,25 @@
 <listaArgsFormalesOVacio> ::= <listaArgsFormales> | epsilon
 
 
-
-
---------------------------HASTA ACA TENGO CHEQUEADO-------------------------------------------
-
 <listaArgsFormales>::= <ArgFormal> <listaArgsFormalesAux> 
 
 <listaArgsFormalesAux> ::= ,<listaArgsFormales> | epsilon 
+
 
 <ArgFormal>:<Tipo> idMetVar
 
 <bloque> ::= { <listaSentencias>}
 
-
 <listaSentencias>::= <sentencia> <listaSentencias> | epsilon
-
 
 
 <sentencia> ::= ;
 <sentencia> ::= <acceso> <asignacionOLlamada>; 
 <Sentencia> ::= <Tipo> <ListaDecVars> ;
-
-
 <Sentencia> ::= if ( <Expresion> ) <Sentencia> <ConOSinElse>
-
 <Sentencia> ::= while ( <Expresion> ) <Sentencia>
-
 <Sentencia> ::= <Bloque>
 <Sentencia> ::= return <ExpresionOVacio> ;
-
-
-
 
 <ConOSinElse>::= else <Sentencia> | epsilon
 
@@ -69,49 +57,35 @@
 
 <ListaDecVarsAux> :: = , <ListaDecVars> | epsilon
 
-
-
-
-
-
-
-
 <asignacionOLlamada>:: = <tipoDeAsignacion><Expresion> | epsilon    //aca abarca asignacion o llamada si es epsilon
-
-
-
 
 <acceso> ::= this <encadenado>| idMetVar <accesoMetOVar> <encadenado> | static idClase . idMetVar (listaExpsOVacio) <encadenado>| new idClase (listaExpsOVacio) <encadenado>| (expresion) <encadenado>
 
-
-<accesoMetOVar> ::= (listaExpOVacio)| epsilon //aca abarca acceso a metodo o variable si es epsilon
-
+<accesoMetOVar> ::= (listaExpsOVacio)| epsilon //aca abarca acceso a metodo o variable si es epsilon
 
 
 <listaExpsOVacio> :: = <listaExps> | epsilon 
 
-
 <listaExps> ::= <expresion> <listaExpsAux>
+
 <listaExpsAux> ::= , <listaExps> | epsilon
-
-
 
 <Encadenado> ::= . idMetVar <accesoMetOVar> <Encadenado> | epsilon
 
-
 <Metodo> ::= static <TipoMetodo> idMetVar <ArgsFormales> <Bloque> | dynamic <TipoMetodo> idMetVar <ArgsFormales> <Bloque>
+
 <TipoMetodo> ::= <Tipo> | void
-
-
-
-
-
---------------EXPRESION---------------------------------------------------
 
 <ExpresionOVacio> ::= <Expresion> | epsilon
 
-
 <Expresion> :: = <ExpresionUnaria>  <expresionAux>
+--------------------------HASTA ACA TENGO CHEQUEADO-------------------------------------------
+
+
+
+
+
+
 
 <expresionAux> :: = <operadorBinario> <ExpresionUnaria> <expresionAux> | epsilon
 

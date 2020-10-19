@@ -45,14 +45,14 @@ public class AnalizadorSintactico {
 	
 	
 	
-	
+	//Chequeado
 	private void inicial() throws ErrorSintactico, IOException, ErrorLexico{
 			clase();
 			listaClases();
 			match("EOF","fin de archivo");
 		
 	}
-	
+	//Chequeado
 	private void listaClases() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		 if(Arrays.asList("T_Class").contains(tokenActual.getToken())){
@@ -67,7 +67,7 @@ public class AnalizadorSintactico {
 		 }
 		
 	}
-	
+	//Chequeado
 	private void clase() throws ErrorSintactico, IOException, ErrorLexico{
 		match("T_Class","palabra clave class");
 		match("idClase","identificador de clase");
@@ -77,7 +77,7 @@ public class AnalizadorSintactico {
 		match("T_llavesFin","}");
 		
 	}
-	
+	//Chequeado
 	private void herencia() throws ErrorSintactico, IOException, ErrorLexico{
 		 
 		if(Arrays.asList("T_Extends").contains(tokenActual.getToken())){
@@ -95,7 +95,7 @@ public class AnalizadorSintactico {
 		
 		
 	}
-	
+	//Chequeado
 	private void listaMiembros() throws ErrorSintactico, IOException, ErrorLexico{
 		 if(Arrays.asList("T_Public","T_Private","idClase","T_Static","T_Dynamic").contains(tokenActual.getToken())){
 			
@@ -112,7 +112,7 @@ public class AnalizadorSintactico {
 		
 	}
 	
-	
+	//Chequeado
 	private void miembro() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		
@@ -136,7 +136,7 @@ public class AnalizadorSintactico {
 			}
 	}
 	
-	
+	//Chequeado
 	private void atributo()throws ErrorSintactico, IOException, ErrorLexico{
 		
 		match(tokenActual.getToken(),"public o private");  //matcheo con public o private
@@ -145,7 +145,7 @@ public class AnalizadorSintactico {
 		match("T_PyC",";");
 		
 	}
-	
+	//Chequeado
 	private void constructor()throws ErrorSintactico, IOException, ErrorLexico{
 		
 		match("idClase","identificador de clase");
@@ -153,7 +153,7 @@ public class AnalizadorSintactico {
 		bloque();
 
 	}
-	
+	//Chequeado
 	private void metodo()throws ErrorSintactico, IOException, ErrorLexico{
 		
 		
@@ -164,7 +164,7 @@ public class AnalizadorSintactico {
 		bloque();
 			
 	}
-	
+	//Chequeado
 	private void tipoMetodo()throws ErrorSintactico, IOException, ErrorLexico{
 	
 		 if(Arrays.asList("T_Boolean","T_Char","idClase","T_Int","T_String").contains(tokenActual.getToken())){
@@ -172,13 +172,15 @@ public class AnalizadorSintactico {
 		 }else if(esIgual("T_Void")){
 			  match("T_Void","palabra clave void");
 		 }else{
-			 throw new ErrorSintactico("tipo no definido en la declaracion del metodo");
+			 throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un tipo primitivo,identificador de clase o palabra reservada void se encontro \""+tokenActual.getLexema()+"\""
+						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+							tokenActual.getNroLinea()+"]");
 		 }
 	}
 	
 	
 	
-	
+	//Chequeado
 	private void tipo()throws ErrorSintactico, ErrorLexico, IOException{
 			
 				switch(tokenActual.getToken()){
@@ -205,7 +207,6 @@ public class AnalizadorSintactico {
 						break;
 
 					default: 
-							System.out.println("La capturo acaaaa en tipo");
 							throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un tipo primitivo o identificador de clase se encontro \""+tokenActual.getLexema()+"\""
 								+"\n\n[Error:"+tokenActual.getLexema()+"|"+
 									tokenActual.getNroLinea()+"]");
@@ -216,14 +217,14 @@ public class AnalizadorSintactico {
 		
 	}
 	
-	
+	//Chequeado
 	private void listaDeAtribs()throws ErrorSintactico, ErrorLexico, IOException{
 		
 		match("idMetVar","identificador de metodo o variable");
 		listaDeAtribsAux();
 		
 	}
-	
+	//Chequeado
 	private void listaDeAtribsAux()throws ErrorSintactico, ErrorLexico, IOException{
 		
 			if(esIgual("T_coma")){
@@ -241,7 +242,7 @@ public class AnalizadorSintactico {
 	
 	
 	
-	
+	//Chequeado
 	private void argsFormales() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		match("T_parenIni","(");
@@ -249,7 +250,7 @@ public class AnalizadorSintactico {
 		match("T_parenFin",")");
 			
 	}
-	
+	//Chequeado
 	private void listaArgsFormalesOVacio() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		
@@ -268,7 +269,7 @@ public class AnalizadorSintactico {
 		
 	}
 	
-	
+	//Chequeado
 	private void listaArgsFormales() throws ErrorSintactico, IOException, ErrorLexico{
 			
 			argFormal();
@@ -277,34 +278,45 @@ public class AnalizadorSintactico {
 	
 	}
 	
-	
+	//Chequeado
 	private void listaArgsFormalesAux() throws ErrorSintactico, IOException, ErrorLexico{
 		
 			if(esIgual("T_coma")){
 				match("T_coma",",");
 				listaArgsFormales();
-			}else{
+			}else if(esIgual("T_parenFin")){
 				 //epsilon no se hace nada
-			}
+			 }else{
+				 throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba una Coma \",\" o parentesis de cierre \")\""
+				 		+ " se encontro \""+tokenActual.getLexema()+"\""
+							+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+														tokenActual.getNroLinea()+"]");
+			 }
 				
 	}
 	
+	
+	
+	
+	
+	//Chequeado
 	private void argFormal() throws ErrorSintactico, IOException, ErrorLexico{
 			
 			tipo();
 			match("idMetVar","identificador de metodo o variable");
 	}
 	
-	
+	//Chequeado
 	private void bloque() throws ErrorSintactico, IOException, ErrorLexico{
 		
-		match("T_llavesIni","(");
+		match("T_llavesIni","{");
 		
 		listaSentencias();
-		match("T_llavesFin",")");
+		match("T_llavesFin","}");
 		
 	}
 	
+	//Chequeado
 	private void listaSentencias() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		if(Arrays.asList("T_Boolean","T_Char","idClase","T_Int","T_String"
@@ -314,13 +326,19 @@ public class AnalizadorSintactico {
 						sentencia();
 						listaSentencias();
 		
-		}else{
+		}else if (esIgual("T_llavesFin")){
 				//epsilon no se hace nada
+		}else{
+			 throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba una sentencia"
+				 		+ " se encontro \""+tokenActual.getLexema()+"\""
+							+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+														tokenActual.getNroLinea()+"]");
 		}
 		
 
 	}
 	
+	//Chequeado
 	private void sentencia() throws ErrorSintactico, IOException, ErrorLexico{
 		
 				switch(tokenActual.getToken()){
@@ -375,14 +393,11 @@ public class AnalizadorSintactico {
 						 				expresionOVacio();
 						 				match("T_PyC",";");
 						 				break;
-					
-					
-					
-					
 				}
 		
 	}
 	
+	//Chequeado
 	private void conOsinElse() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		if(esIgual("T_Else")){
@@ -392,36 +407,40 @@ public class AnalizadorSintactico {
 		
 	}
 	
+	//Chequeado
 	private void listaDeVars() throws ErrorSintactico, IOException, ErrorLexico{
 		
 			match("idMetVar","identificador de metodo o variable");
 			listaDeVarsAux();
 			
 	}
-	
+	//Chequeado
 	private void listaDeVarsAux() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		if(esIgual("T_coma")){
 			match("T_coma",",");
 			listaDeVars();
-		}else{
+		}else if(esIgual("T_PyC")){
 			//epsilon no se hace nada
+		}else{
+			throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba una Coma \",\" o Punto y coma \";\" para finalizar la sentencia"
+			 		+ " se encontro \""+tokenActual.getLexema()+"\""
+						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+													tokenActual.getNroLinea()+"]");
 		}
+			
 	}
 	
 	
 	
-	
+	//Chequeado
 	private void asignacionOLlamada() throws ErrorSintactico, IOException, ErrorLexico{
 		 
 			if(Arrays.asList("op=","op+=","op-=").contains(tokenActual.getToken())){
 				
 					match(tokenActual.getToken(),"operador de asignacion (=,-=,+=)");
 					expresion();
-			}else{
-				//epsilon no se hace nada (aca es el caso de una llamada)
 			}
-		
 		
 	}
 	
@@ -430,7 +449,7 @@ public class AnalizadorSintactico {
 	
 	
 	
-	
+	//Chequeado
 	private void acceso() throws ErrorSintactico, IOException, ErrorLexico{
 				
 				switch(tokenActual.getToken()){
@@ -478,7 +497,7 @@ public class AnalizadorSintactico {
 				encadenado();
 				
 	}
-	
+	//Chequeado
 	private void encadenado() throws ErrorSintactico, IOException, ErrorLexico{
 		
 			if(esIgual("T_punto")){
@@ -487,12 +506,10 @@ public class AnalizadorSintactico {
 				match("idMetVar","identificador de metodo o variable");
 				accesoMetOVar();
 				encadenado();
-			}else{
-				//epsilon
 			}
 	}
 	
-	
+	//Chequeado
 	private void accesoMetOVar() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		
@@ -505,7 +522,7 @@ public class AnalizadorSintactico {
 	
 	}
 	
-	
+	//Chequeado
 	private void listaExpsOVacio() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		
@@ -514,27 +531,38 @@ public class AnalizadorSintactico {
 
 			listaExprs();
 		
-		}else{
+		}else if (esIgual("T_parenFin")){
 			//epsilon no hago nada
+		}else{
+			throw new ErrorSintactico(tokenActual.getNroLinea()+" : Se esperaba argumento actual"
+			 		+ " se encontro \""+tokenActual.getLexema()+"\""
+						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+													tokenActual.getNroLinea()+"]");
 		}
 	}
 	
+	
+	//Chequeado
 	private void listaExprs() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		expresion();
 		listaExprsAux();
 		
 	}
-	
+	//Chequeado
 	private void listaExprsAux() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		if(esIgual("T_coma")){
 			match("T_coma","coma (,)");
 			listaExprs();
+		}else if (esIgual("T_parenFin")){
+			//epsilon no hago nada
 		}else{
-			//epsilon no se hace nada
+			throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba una Coma \",\" o parentesis de cierre \")\""
+			 		+ " se encontro \""+tokenActual.getLexema()+"\""
+						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+													tokenActual.getNroLinea()+"]");
 		}
-		
 		
 	}
 	
@@ -544,7 +572,7 @@ public class AnalizadorSintactico {
 	//----------------Metodos para manejar la parte de expresion-------------------------
 	
 	
-	
+	//Chequeado
 	private void expresionOVacio() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		if(Arrays.asList("op+","op-","op!","LitNull","LitBoolean","LitEntero","LitCaracter","LitString"
@@ -552,15 +580,19 @@ public class AnalizadorSintactico {
 		
 				expresion();
 		
+		}if (esIgual("T_PyC")){
+			 //epsilon no se hace nada
 		}else{
-					
-				//epsilon no se hace nada
+			throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba retornar una expresion "
+					+ "se encontro \""+tokenActual.getLexema()+"\""
+					+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+						tokenActual.getNroLinea()+"]");
 		}
 	
 	}
 	
 	
-	
+	//Chequeado
 	private void expresion() throws ErrorSintactico, IOException, ErrorLexico{
 		
 				expresionUnaria();
@@ -616,7 +648,10 @@ public class AnalizadorSintactico {
 						acceso();
 		}else{
 					
-						throw new ErrorSintactico("operando");
+			throw new ErrorSintactico(tokenActual.getNroLinea()+" : operando"
+			 		+ " se encontro \""+tokenActual.getLexema()+"\""
+						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+													tokenActual.getNroLinea()+"]");
 		}
 		
 	}

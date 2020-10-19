@@ -15,7 +15,7 @@ public class Principal {
 		try {
 			
 			
-			gestorDeFuente = new GestorDeArchivo("C:/Users/franc/OneDrive/Escritorio/01.LllamadasSinEnc");
+			gestorDeFuente = new GestorDeArchivo("C:/Users/franc/OneDrive/Escritorio/archivos.java");
 		
 			AnalizadorLexico anlex = new AnalizadorLexico(gestorDeFuente);
 		
