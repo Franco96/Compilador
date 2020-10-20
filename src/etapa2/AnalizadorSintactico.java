@@ -233,7 +233,9 @@ public class AnalizadorSintactico {
 			}else if (esIgual("T_PyC")){
 				 //epsilon no se hace nada
 			}else{
-				throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba coma (,) se encontro \""+tokenActual.getLexema()+"\""
+				throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba una Coma \",\" o "
+						+ "Punto y coma \";\" para finalizar la declaracion del atributo "
+						+ "se encontro \""+tokenActual.getLexema()+"\""
 						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
 							tokenActual.getNroLinea()+"]");
 			}
@@ -569,7 +571,7 @@ public class AnalizadorSintactico {
 	
 	
 	
-	//----------------Metodos para manejar la parte de expresion-------------------------
+
 	
 	
 	//Chequeado
@@ -600,16 +602,21 @@ public class AnalizadorSintactico {
 				
 	}
 	
+	//Chequeado
 	private void expresionAux() throws ErrorSintactico, IOException, ErrorLexico{
 	
 		if(Arrays.asList("op+","op-","op==","op!=","op<","op>","op<=","op>=","op*","op/","op%","opOR","opAND").contains(tokenActual.getToken())){
 					
 			match(tokenActual.getToken(),"operador binario"); 
-			expresionUnaria();
-			expresionAux();
-		}else{
+			expresion();
 			
+		}else if(Arrays.asList("T_PyC","T_coma","T_llavesFin","T_parenFin").contains(tokenActual.getToken())) {
 			//epsilon no se hace nada
+		}else{
+			throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un operador binario "
+					+ "se encontro \""+tokenActual.getLexema()+"\""
+					+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+						tokenActual.getNroLinea()+"]");
 		}
 		
 	}
@@ -620,18 +627,21 @@ public class AnalizadorSintactico {
 	private void expresionUnaria() throws ErrorSintactico, IOException, ErrorLexico{
 		
 			
-			if(Arrays.asList("op+","op-","op!").contains(tokenActual.getToken())){
+			if(Arrays.asList("op+","op-","op!").contains(tokenActual.getToken()))
 					
 						match(tokenActual.getToken(),"operador unario");
-						operando();
 						
-			}else if(Arrays.asList("LitNull","LitBoolean","LitEntero","LitCaracter","LitString"
+						
+			if(Arrays.asList("LitNull","LitBoolean","LitEntero","LitCaracter","LitString"
 					,"T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
 					
 						operando();
 			
 			}else{
-					throw new ErrorSintactico(tokenActual.getNroLinea()+"-"+tokenActual.getToken()+"-"+tokenActual.getLexema()+"-unaria");
+				throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un operando con un tipo de operador unario de ser necesario"
+						+ "se encontro \""+tokenActual.getLexema()+"\""
+						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+							tokenActual.getNroLinea()+"]");
 			}
 		
 	}
@@ -646,15 +656,8 @@ public class AnalizadorSintactico {
 		}else if(Arrays.asList("T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
 						
 						acceso();
-		}else{
-					
-			throw new ErrorSintactico(tokenActual.getNroLinea()+" : operando"
-			 		+ " se encontro \""+tokenActual.getLexema()+"\""
-						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
-													tokenActual.getNroLinea()+"]");
 		}
 		
 	}
 	
-	//------------------------------------------------------------------------------------
 }

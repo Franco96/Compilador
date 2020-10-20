@@ -24,13 +24,13 @@ public class Principal {
 			System.out.println("sistacticamente correcto");
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (ErrorLexico e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
+			
 		} catch (ErrorSintactico e) {
-			// TODO Auto-generated catch block
+			
 			System.out.println(e.getMessage());
 
 	}

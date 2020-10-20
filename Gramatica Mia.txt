@@ -79,6 +79,14 @@
 <ExpresionOVacio> ::= <Expresion> | epsilon
 
 <Expresion> :: = <ExpresionUnaria>  <expresionAux>
+
+<expresionAux> :: = <operadorBinario> <Expresion> | epsilon
+
+
+<ExpresionUnaria> ::= + <Operando> | - <Operando> | ! <Operando> | <Operando>
+
+<Operando> ::= null | true | false | litEntero | litchar | litstring| <acceso>
+
 --------------------------HASTA ACA TENGO CHEQUEADO-------------------------------------------
 
 
@@ -87,13 +95,11 @@
 
 
 
-<expresionAux> :: = <operadorBinario> <ExpresionUnaria> <expresionAux> | epsilon
+
 
 	
 
-<ExpresionUnaria> ::= + <Operando> | - <Operando> | ! <Operando> | <Operando>
 
-<Operando> ::= null | true | false | litEntero | charlit | stringlit | <acceso>
 
 
 
