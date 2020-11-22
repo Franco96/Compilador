@@ -2,9 +2,14 @@ package etapa2;
 
 import java.io.IOException;
 import java.util.Arrays;
-import Excepciones.ErrorLexico;
-import Excepciones.ErrorSintactico;
+
+import javax.swing.tree.VariableHeightLayoutCache;
+
+import Excepciones.*;
 import etapa1.*;
+import etapa3.*;
+import etapa4.*;
+
 
 
 public class AnalizadorSintactico {
@@ -12,13 +17,15 @@ public class AnalizadorSintactico {
 
 	private AnalizadorLexico aLex;	
 	private Token tokenActual;
+	private TablaDeSimbolos ts;
 
 	
 	
 	public AnalizadorSintactico(AnalizadorLexico aLex) throws IOException, ErrorLexico, ErrorSintactico{
 		this.aLex = aLex;
 		tokenActual = aLex.proximoToken(); 
-		inicial();
+		ts = TablaDeSimbolos.getTablaDeSimbolos();
+		
 	}
 	
 	
@@ -39,21 +46,15 @@ public class AnalizadorSintactico {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	//Chequeado
-	private void inicial() throws ErrorSintactico, IOException, ErrorLexico{
+
+	public void inicial() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 			clase();
 			listaClases();
 			match("EOF","fin de archivo");
 		
 	}
-	//Chequeado
-	private void listaClases() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private void listaClases() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
 		 if(Arrays.asList("T_Class").contains(tokenActual.getToken())){
 			 clase();
@@ -67,26 +68,42 @@ public class AnalizadorSintactico {
 		 }
 		
 	}
-	//Chequeado
-	private void clase() throws ErrorSintactico, IOException, ErrorLexico{
+
+	private void clase() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
+		
+		Token aux;
+		
 		match("T_Class","palabra clave class");
+		aux = tokenActual;
 		match("idClase","identificador de clase");
-		herencia();
+		
+		Clase clase = new Clase(aux);
+		ts.setClaseActual(clase);
+		Token hereda = herencia();
+		ts.getClaseActual().setHereda(hereda);
 		match("T_llavesIni","{");
 		listaMiembros();
 		match("T_llavesFin","}");
 		
+		ts.insertarClase(clase);
+		
+		
 	}
-	//Chequeado
-	private void herencia() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private Token herencia() throws ErrorSintactico, IOException, ErrorLexico{
 		 
 		if(Arrays.asList("T_Extends").contains(tokenActual.getToken())){
 			
 			match("T_Extends","palabra clave extends");
+			Token hereda = tokenActual;
 			match("idClase","identificador de clase");
+			
+			return hereda;
 		}
 		else if(esIgual("T_llavesIni")){
-			//no hago nada epsilon
+			
+			return  new Token("idClase", "Object", 0);
+			
 		}else{
 			throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba palabra clave extends se encontro \""+tokenActual.getLexema()+"\""
 					+"\n\n[Error:"+tokenActual.getLexema()+"|"+
@@ -95,8 +112,8 @@ public class AnalizadorSintactico {
 		
 		
 	}
-	//Chequeado
-	private void listaMiembros() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private void listaMiembros() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		 if(Arrays.asList("T_Public","T_Private","idClase","T_Static","T_Dynamic").contains(tokenActual.getToken())){
 			
 			 	miembro();
@@ -112,8 +129,8 @@ public class AnalizadorSintactico {
 		
 	}
 	
-	//Chequeado
-	private void miembro() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private void miembro() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
 		
 			switch(tokenActual.getToken()){
@@ -136,41 +153,50 @@ public class AnalizadorSintactico {
 			}
 	}
 	
-	//Chequeado
-	private void atributo()throws ErrorSintactico, IOException, ErrorLexico{
-		
+	
+	private void atributo()throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
+		String visibilidad = tokenActual.getLexema();    
 		match(tokenActual.getToken(),"public o private");  //matcheo con public o private
-		tipo();
-		listaDeAtribs();
+		Tipo tipo = tipo();
+		listaDeAtribs(tipo,visibilidad);
 		match("T_PyC",";");
 		
 	}
-	//Chequeado
-	private void constructor()throws ErrorSintactico, IOException, ErrorLexico{
-		
+	
+	private void constructor()throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
+		Token aux = tokenActual;
 		match("idClase","identificador de clase");
+		ts.getClaseActual().insertarConstructor(aux, new TipoVoid(aux.getNroLinea()));
+		ts.setMetodoActual(ts.getClaseActual().getConstructor());
 		argsFormales();
-		bloque();
-
+		Bloque bloque = bloque();
+		ts.getClaseActual().getConstructor().setBloque(bloque);
 	}
-	//Chequeado
-	private void metodo()throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private void metodo()throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
-		
+		String formaMetodo = tokenActual.getLexema();
 		match(tokenActual.getToken(),"static o dynamic");  //matcheo con static o dynamic
-		tipoMetodo();
+		Tipo tipo = tipoMetodo();
+		Token aux = tokenActual;
 		match("idMetVar","identificador de metodo o variable");
+		Metodo m = new Metodo(aux, formaMetodo, tipo);
+		ts.setMetodoActual(m);
 		argsFormales();
-		bloque();
-			
+		Bloque bloque = bloque();
+		m.setBloque(bloque);
+		ts.getClaseActual().insetarMetodo(m);	
 	}
-	//Chequeado
-	private void tipoMetodo()throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private Tipo tipoMetodo()throws ErrorSintactico, IOException, ErrorLexico{
 	
 		 if(Arrays.asList("T_Boolean","T_Char","idClase","T_Int","T_String").contains(tokenActual.getToken())){
-			 tipo();
+			return tipo();
 		 }else if(esIgual("T_Void")){
+			  Token aux = tokenActual;
 			  match("T_Void","palabra clave void");
+			 
+			 return new TipoVoid(aux.getNroLinea()); 
 		 }else{
 			 throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un tipo primitivo,identificador de clase o palabra reservada void se encontro \""+tokenActual.getLexema()+"\""
 						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
@@ -180,31 +206,38 @@ public class AnalizadorSintactico {
 	
 	
 	
-	//Chequeado
-	private void tipo()throws ErrorSintactico, ErrorLexico, IOException{
+	
+	private Tipo tipo()throws ErrorSintactico, ErrorLexico, IOException{
 			
+		Tipo tipo = null;
+		    
 				switch(tokenActual.getToken()){
 		
 				
 					case "T_Boolean":
+							tipo = new TipoBoolean(tokenActual.getNroLinea());
 							match("T_Boolean","palabra clave boolean");
 							break;
 					
 					case "T_Char":
-						match("T_Char","palabra clave char");
-						break;
+							tipo = new TipoChar(tokenActual.getNroLinea());
+							match("T_Char","palabra clave char");
+							break;
 					
 					case "T_Int":
-						match("T_Int","palabra clave int");
-						break;
+							tipo = new TipoInt(tokenActual.getNroLinea());
+							match("T_Int","palabra clave int");
+							break;
 					
 					case "T_String":
-						match("T_String","palabra clave String");
-						break;
+							tipo = new TipoString(tokenActual.getNroLinea());
+							match("T_String","palabra clave String");
+							break;
 						
 					case "idClase":
-						match("idClase","identificador de clase");
-						break;
+							tipo = new TipoClase(tokenActual);
+							match("idClase","identificador de clase");
+							break;
 
 					default: 
 							throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un tipo primitivo o identificador de clase se encontro \""+tokenActual.getLexema()+"\""
@@ -213,23 +246,29 @@ public class AnalizadorSintactico {
 							
 
 				}
+				
+				
+				return tipo;
 		
 		
 	}
 	
-	//Chequeado
-	private void listaDeAtribs()throws ErrorSintactico, ErrorLexico, IOException{
+	
+	private void listaDeAtribs(Tipo tipo,String visibilidad)throws ErrorSintactico, ErrorLexico, IOException, ErrorSemantico{
 		
+		Token aux = tokenActual;
 		match("idMetVar","identificador de metodo o variable");
-		listaDeAtribsAux();
+		Atributo atrib = new Atributo(aux, visibilidad, tipo);
+		ts.getClaseActual().insertarAtributo(atrib);
+		listaDeAtribsAux(tipo,visibilidad);
 		
 	}
-	//Chequeado
-	private void listaDeAtribsAux()throws ErrorSintactico, ErrorLexico, IOException{
+	
+	private void listaDeAtribsAux(Tipo tipo,String visibilidad)throws ErrorSintactico, ErrorLexico, IOException, ErrorSemantico{
 		
 			if(esIgual("T_coma")){
 				match("T_coma",",");
-				listaDeAtribs();
+				listaDeAtribs(tipo,visibilidad);
 			}else if (esIgual("T_PyC")){
 				 //epsilon no se hace nada
 			}else{
@@ -244,21 +283,23 @@ public class AnalizadorSintactico {
 	
 	
 	
-	//Chequeado
-	private void argsFormales() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private void argsFormales() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
 		match("T_parenIni","(");
 		listaArgsFormalesOVacio();
 		match("T_parenFin",")");
 			
 	}
-	//Chequeado
-	private void listaArgsFormalesOVacio() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	
+	
+	private void listaArgsFormalesOVacio() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
 		
 		 if(Arrays.asList("T_Boolean","T_Char","idClase","T_Int","T_String").contains(tokenActual.getToken()))
 				
-			 	listaArgsFormales();
+			 	listaArgsFormales(0);
 		 else if(esIgual("T_parenFin")){
 			 //epsilon no se hace nada
 		 }else{
@@ -271,21 +312,21 @@ public class AnalizadorSintactico {
 		
 	}
 	
-	//Chequeado
-	private void listaArgsFormales() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private void listaArgsFormales(int indice) throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 			
-			argFormal();
-			listaArgsFormalesAux();
+			argFormal(indice);
+			listaArgsFormalesAux(indice);
 			
 	
 	}
 	
-	//Chequeado
-	private void listaArgsFormalesAux() throws ErrorSintactico, IOException, ErrorLexico{
+
+	private void listaArgsFormalesAux(int indice) throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
 			if(esIgual("T_coma")){
 				match("T_coma",",");
-				listaArgsFormales();
+				listaArgsFormales(indice+1);
 			}else if(esIgual("T_parenFin")){
 				 //epsilon no se hace nada
 			 }else{
@@ -301,31 +342,39 @@ public class AnalizadorSintactico {
 	
 	
 	
-	//Chequeado
-	private void argFormal() throws ErrorSintactico, IOException, ErrorLexico{
+
+	private void argFormal(int indice) throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 			
-			tipo();
+			Tipo tipo = tipo();
+			Token aux = tokenActual;
 			match("idMetVar","identificador de metodo o variable");
+			Parametro p = new Parametro(aux, tipo, indice);
+			ts.getMetodoActual().insertarParametros(p);
 	}
 	
-	//Chequeado
-	private void bloque() throws ErrorSintactico, IOException, ErrorLexico{
-		
+	
+	private Bloque bloque() throws ErrorSintactico, IOException, ErrorLexico{
+		Token aux = tokenActual;
 		match("T_llavesIni","{");
-		
+		Bloque bloque = new Bloque(aux);
+		TablaDeSimbolos.getTablaDeSimbolos().setBloqueActual(bloque);
 		listaSentencias();
 		match("T_llavesFin","}");
-		
+		return bloque;
 	}
 	
-	//Chequeado
+	
 	private void listaSentencias() throws ErrorSintactico, IOException, ErrorLexico{
+		
+		
 		
 		if(Arrays.asList("T_Boolean","T_Char","idClase","T_Int","T_String"
 						,"T_PyC","T_This","idMetVar","T_Static","T_New","T_parenIni"
 						,"T_If","T_While","T_Return","T_llavesIni").contains(tokenActual.getToken())){
-		
-						sentencia();
+			
+						Sentencia sentencia = null;
+					    sentencia = sentencia();
+					    TablaDeSimbolos.getTablaDeSimbolos().getBloqueActual().addSent(sentencia);
 						listaSentencias();
 		
 		}else if (esIgual("T_llavesFin")){
@@ -340,13 +389,18 @@ public class AnalizadorSintactico {
 
 	}
 	
-	//Chequeado
-	private void sentencia() throws ErrorSintactico, IOException, ErrorLexico{
-		
+	
+	private Sentencia sentencia() throws ErrorSintactico, IOException, ErrorLexico{
+				
+				Sentencia sent=null;
+				
+			
 				switch(tokenActual.getToken()){
 		
 					case "T_PyC":
+										
 										match("T_PyC",";");
+										sent = new SentenciaVacia();
 										break;
 					case "T_This":
 					case "idMetVar":
@@ -354,9 +408,11 @@ public class AnalizadorSintactico {
 					case "T_New":
 					case "T_parenIni":
 										
-										acceso();
-										asignacionOLlamada();
+										Acceso acceso = acceso();
+										SentenciaAsignacion senAsig = asignacionOLlamada(acceso);
 										match("T_PyC",";");
+										
+										sent = (senAsig == null)? new SentenciaLlamada(acceso): senAsig;
 										break;
 					
 					case "T_Boolean":
@@ -364,30 +420,37 @@ public class AnalizadorSintactico {
 					case "idClase":
 					case "T_Int":
 					case "T_String":
-										tipo();
-										listaDeVars();
+										Tipo tipo = tipo();
+										listaDeVars(tipo);
 										match("T_PyC",";");
 										break;
 					
 					case "T_If":
 										match("T_If","palabra clave if");
 										match("T_parenIni","(");
-										expresion();
+										Expresion condicionIf = expresion();
 										match("T_parenFin",")");
-										sentencia();
-										conOsinElse();
+										Sentencia cuerpoIf = sentencia();
+										Sentencia cuerpoElse = conOsinElse();
+										sent = new SentenciaIf(condicionIf, cuerpoIf, cuerpoElse);
 										break;
 					
 					case "T_While": 
 										match("T_While","palabra clave while");
 										match("T_parenIni","(");
-										expresion();
+										Expresion condicionWhile = expresion();
 										match("T_parenFin",")");
-										sentencia();
+										Sentencia cuerpoWhile = sentencia();
+										sent = new SentenciaWhile(condicionWhile, cuerpoWhile);
 										break;
 										
 					case "T_llavesIni":
-										bloque();
+										Bloque bloqueAux = TablaDeSimbolos.getTablaDeSimbolos().getBloqueActual();
+										
+										Bloque bloque = bloque();
+										
+										TablaDeSimbolos.getTablaDeSimbolos().setBloqueActual(bloqueAux);
+										sent = new SentenciaBloque(bloque);
 										break;
 										
 					case "T_Return": 
@@ -395,33 +458,48 @@ public class AnalizadorSintactico {
 						 				expresionOVacio();
 						 				match("T_PyC",";");
 						 				break;
+						 				
+					default :
+								throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba una sentencia"
+											+ " se encontro \""+tokenActual.getLexema()+"\""
+											+"\n\n[Error:"+tokenActual.getLexema()+"|"+
+																	tokenActual.getNroLinea()+"]");
 				}
+				
+				
+			return sent;
 		
 	}
 	
-	//Chequeado
-	private void conOsinElse() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private Sentencia conOsinElse() throws ErrorSintactico, IOException, ErrorLexico{
+		
+		Sentencia sent = null;
 		
 		if(esIgual("T_Else")){
 			match("T_Else","palabra clave else");
-			sentencia();
+			sent = sentencia();
 		}
 		
+		return sent;
 	}
 	
-	//Chequeado
-	private void listaDeVars() throws ErrorSintactico, IOException, ErrorLexico{
-		
+	
+	private void listaDeVars(Tipo tipo) throws ErrorSintactico, IOException, ErrorLexico{
+			
+			Token id = tokenActual;
 			match("idMetVar","identificador de metodo o variable");
-			listaDeVarsAux();
+			Variable var = new Variable(id, tipo);
+			TablaDeSimbolos.getTablaDeSimbolos().getBloqueActual().addVar(var);
+			listaDeVarsAux(tipo);
 			
 	}
-	//Chequeado
-	private void listaDeVarsAux() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private void listaDeVarsAux(Tipo tipo) throws ErrorSintactico, IOException, ErrorLexico{
 		
 		if(esIgual("T_coma")){
 			match("T_coma",",");
-			listaDeVars();
+			listaDeVars(tipo);
 		}else if(esIgual("T_PyC")){
 			//epsilon no se hace nada
 		}else{
@@ -435,14 +513,23 @@ public class AnalizadorSintactico {
 	
 	
 	
-	//Chequeado
-	private void asignacionOLlamada() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private SentenciaAsignacion asignacionOLlamada(Acceso acceso) throws ErrorSintactico, IOException, ErrorLexico{
 		 
+		SentenciaAsignacion senAsig = null;
+		
+		
 			if(Arrays.asList("op=","op+=","op-=").contains(tokenActual.getToken())){
-				
+					
+					Token tipoAsig = tokenActual;
 					match(tokenActual.getToken(),"operador de asignacion (=,-=,+=)");
-					expresion();
+					Expresion exp = expresion();
+					
+					senAsig = new SentenciaAsignacion(tipoAsig, acceso, exp);
 			}
+			
+			
+			return senAsig;
 		
 	}
 	
@@ -451,87 +538,119 @@ public class AnalizadorSintactico {
 	
 	
 	
-	//Chequeado
-	private void acceso() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private Acceso acceso() throws ErrorSintactico, IOException, ErrorLexico{
 				
+		Acceso acceso = null;
+		Token aux;
+		
 				switch(tokenActual.getToken()){
 				
 					case "T_This":
+									aux = tokenActual;
 									match("T_This","palabra clave this");
+									acceso = new AccesoThis(aux);
 									break;
 					
 					case "idMetVar":			
-									
+									aux = tokenActual;
 									match("idMetVar","identificador de metodo o variable");
-									accesoMetOVar();
+									AccesoMetodo actMet =  accesoMetOVar(aux); 
+									acceso = (actMet == null)? new AccesoVar(aux) : actMet;
 									break;
 					
 					case "T_Static":
 									
 									match("T_Static","static");
+									aux = tokenActual;
 									match("idClase","identificador de clase");
+									AccesoEstatico actEstatic = new AccesoEstatico(aux); 
 									match("T_punto","punto (.)");
+									aux = tokenActual;
 									match("idMetVar","identificador de metodo o variable");
+									AccesoMetodo actMetodo = new AccesoMetodo(aux);  
 									match("T_parenIni","(");
-									listaExpsOVacio();
+									listaExpsOVacio(actMetodo);	
 									match("T_parenFin",")");
+									actEstatic.setAccesoMet(actMetodo);
+									acceso = actEstatic;
 									break;
 					
 					case "T_New":	
 									
 									match("T_New","palabra clave new");
+									aux = tokenActual;
 									match("idClase","identificador de clase");
+									AccesoConstructor aconst = new AccesoConstructor(aux);
 									match("T_parenIni","(");
-									listaExpsOVacio();
+									listaExpsOVacio(aconst);	
 									match("T_parenFin",")");
+									acceso = aconst;
 									break;
 					
 					case "T_parenIni":
-									
-									match("T_parenIni","(");
-									expresion();
+									aux = tokenActual; 
+									match("T_parenIni","("); 
+									Expresion expresion = expresion();
 									match("T_parenFin",")");
+									acceso = new AccesoParentizado(aux, expresion);
 									break;
 					
 				}
 				
 				
-				encadenado();
+				acceso.setEncadenado(encadenado());
+				
+				
+				return acceso;
 				
 	}
-	//Chequeado
-	private void encadenado() throws ErrorSintactico, IOException, ErrorLexico{
+
+	private Encadenado encadenado() throws ErrorSintactico, IOException, ErrorLexico{
+		
+		Encadenado enca = null;
 		
 			if(esIgual("T_punto")){
 				
 				match("T_punto","punto (.)");
+				Token id = tokenActual;
 				match("idMetVar","identificador de metodo o variable");
-				accesoMetOVar();
-				encadenado();
+				
+				AccesoMetodo actMet = accesoMetOVar(id);
+				
+				enca = (actMet == null)? new VarEncadenada(id) : new MetEncadenado(id,actMet);
+				
+				enca.setSiguiente(encadenado());
 			}
+			
+			
+			return enca;
 	}
 	
-	//Chequeado
-	private void accesoMetOVar() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private AccesoMetodo accesoMetOVar(Token token) throws ErrorSintactico, IOException, ErrorLexico{
 		
-		
+		AccesoMetodo accMet = null;
 		if(esIgual( "T_parenIni")){
-			
+				
+				accMet = new AccesoMetodo(token);
 				match("T_parenIni","(");
-				listaExpsOVacio();
+				listaExpsOVacio(accMet);
 				match("T_parenFin",")");
 		}
+		
+		return accMet;
 	
 	}
 	
-	//Chequeado
-	private void listaExpsOVacio() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private void listaExpsOVacio(AccesoMetodo accMet) throws ErrorSintactico, IOException, ErrorLexico{
 		
 		
 		if(Arrays.asList("op+","op-","op!","LitNull","LitBoolean","LitEntero","LitCaracter","LitString"
 				,"T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
 
-			listaExprs();
+			listaExprs(accMet);
 		
 		}else if (esIgual("T_parenFin")){
 			//epsilon no hago nada
@@ -544,19 +663,20 @@ public class AnalizadorSintactico {
 	}
 	
 	
-	//Chequeado
-	private void listaExprs() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private void listaExprs(AccesoMetodo accMet) throws ErrorSintactico, IOException, ErrorLexico{
 		
-		expresion();
-		listaExprsAux();
+		Expresion exp = expresion();
+		accMet.addArgumentos(exp);
+		listaExprsAux(accMet);
 		
 	}
-	//Chequeado
-	private void listaExprsAux() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private void listaExprsAux(AccesoMetodo accMet) throws ErrorSintactico, IOException, ErrorLexico{
 		
 		if(esIgual("T_coma")){
 			match("T_coma","coma (,)");
-			listaExprs();
+			listaExprs(accMet);
 		}else if (esIgual("T_parenFin")){
 			//epsilon no hago nada
 		}else{
@@ -574,7 +694,7 @@ public class AnalizadorSintactico {
 
 	
 	
-	//Chequeado
+
 	private void expresionOVacio() throws ErrorSintactico, IOException, ErrorLexico{
 		
 		if(Arrays.asList("op+","op-","op!","LitNull","LitBoolean","LitEntero","LitCaracter","LitString"
@@ -594,24 +714,36 @@ public class AnalizadorSintactico {
 	}
 	
 	
-	//Chequeado
-	private void expresion() throws ErrorSintactico, IOException, ErrorLexico{
+	
+	private Expresion expresion() throws ErrorSintactico, IOException, ErrorLexico{
 		
-				expresionUnaria();
-				expresionAux();                    
+	
+		
+		ExpresionUnaria expUni = expresionUnaria();
+				
+		ExpresionBinaria expBinAux=  expresionAux(expUni);
+		
+		
+				
+		return (expBinAux ==null)? expUni:expBinAux;                    
 				
 	}
 	
-	//Chequeado
-	private void expresionAux() throws ErrorSintactico, IOException, ErrorLexico{
 	
+	private ExpresionBinaria expresionAux(Expresion exp) throws ErrorSintactico, IOException, ErrorLexico{
+	
+		Token operador;
+		
 		if(Arrays.asList("op+","op-","op==","op!=","op<","op>","op<=","op>=","op*","op/","op%","opOR","opAND").contains(tokenActual.getToken())){
-					
+			
+			operador = tokenActual;
 			match(tokenActual.getToken(),"operador binario"); 
-			expresion();
+			
+			return new ExpresionBinaria(exp ,expresion(), operador);
 			
 		}else if(Arrays.asList("T_PyC","T_coma","T_llavesFin","T_parenFin").contains(tokenActual.getToken())) {
-			//epsilon no se hace nada
+			
+			return null;
 		}else{
 			throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un operador binario "
 					+ "se encontro \""+tokenActual.getLexema()+"\""
@@ -624,39 +756,55 @@ public class AnalizadorSintactico {
 	
 	
 	
-	private void expresionUnaria() throws ErrorSintactico, IOException, ErrorLexico{
+	private ExpresionUnaria expresionUnaria() throws ErrorSintactico, IOException, ErrorLexico{
 		
-			
-			if(Arrays.asList("op+","op-","op!").contains(tokenActual.getToken()))
-					
+			ExpresionUnaria expUni;
+			Token operadorUnario = null;
+		
+			if(Arrays.asList("op+","op-","op!").contains(tokenActual.getToken())){
+						
+						operadorUnario = tokenActual;
 						match(tokenActual.getToken(),"operador unario");
 						
-						
+			}
+			
 			if(Arrays.asList("LitNull","LitBoolean","LitEntero","LitCaracter","LitString"
 					,"T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
 					
-						operando();
+						Operando operando = operando();
+						expUni = new ExpresionUnaria(operando);
+						
+						if(operadorUnario!=null)
+							expUni.setOperador(operadorUnario);
 			
 			}else{
-				throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un operando con un tipo de operador unario de ser necesario"
+				throw new ErrorSintactico(tokenActual.getNroLinea()+" : se esperaba un operando con un tipo de operador unario de ser necesario "
 						+ "se encontro \""+tokenActual.getLexema()+"\""
 						+"\n\n[Error:"+tokenActual.getLexema()+"|"+
 							tokenActual.getNroLinea()+"]");
 			}
+			
+			return expUni;
 		
 	}
 	
 	
-	private void operando() throws ErrorSintactico, IOException, ErrorLexico{
+	private Operando operando() throws ErrorSintactico, IOException, ErrorLexico{
 		
+		Token token;
 		if(Arrays.asList("LitNull","LitBoolean","LitEntero","LitCaracter","LitString").contains(tokenActual.getToken())){
-				
+						
+						token  = tokenActual;
 						match(tokenActual.getToken(),"litaral");
 						
-		}else if(Arrays.asList("T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
+						return new Literal(token);
 						
-						acceso();
-		}
+		}else //if(Arrays.asList("T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
+						
+						
+						return acceso();
+						
+
 		
 	}
 	
