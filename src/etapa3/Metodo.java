@@ -6,10 +6,9 @@ import java.util.Map;
 
 import Excepciones.ErrorSemantico;
 import etapa1.Token;
-import etapa4.AccesoThis;
+
 import etapa4.Bloque;
-import etapa4.Sentencia;
-import etapa4.SentenciaLlamada;
+
 
 
 
@@ -33,7 +32,7 @@ public class Metodo {
 		varLocales = new HashMap<String, Variable>();
 		this.forma = forma;
 		this.tipoRetorno = tipoRetorno;
-		this.bloque = new Bloque(t);
+		this.bloque = new Bloque();
 		isChequeado = false;
 		
 	}
@@ -193,21 +192,7 @@ public class Metodo {
 	
 	public void controlSentencia(Clase clase) throws ErrorSemantico{
 		
-		if(this.isStatic()){
-			
-			for( Sentencia sent : bloque.getSentencias()){
 				
-					if(sent instanceof SentenciaLlamada){
-					
-						if(((SentenciaLlamada) sent).getAcceo() instanceof AccesoThis){
-							
-						}
-					}
-			}
-			
-		}
-		
-		
 		bloque.controlSentencias(clase,this);
 		
 	}

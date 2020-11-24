@@ -72,6 +72,10 @@ public class AccesoVar extends Acceso{
 							 return variable.getTipo();
 		
 		}else {
+						if(metodo.isStatic())
+							throw new ErrorSemantico(t.getNroLinea()+" : no se puede acceder a un atributo en un metodo estatico"
+									+"\n\n[Error:"+t.getLexema()+"|"+
+									t.getNroLinea()+"]");
 			
 						if(encadenado!=null){
 				

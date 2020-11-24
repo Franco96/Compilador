@@ -16,6 +16,10 @@ public class AccesoThis extends Acceso{
 	@Override
 	public Tipo chequear(Clase clase, Metodo metodo) throws ErrorSemantico {
 		
+		if(metodo.isStatic())
+			throw new ErrorSemantico(t.getNroLinea()+" : no se puede acceder a this en un metodo estatico"
+					+"\n\n[Error:"+t.getLexema()+"|"+
+					t.getNroLinea()+"]");
 		
 		if(this.encadenado!=null)
 			

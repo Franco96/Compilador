@@ -38,6 +38,12 @@ public class AccesoMetodo extends Acceso{
 					t.getNroLinea()+"]");
 		}
 		
+		if(metodo.isStatic()&& metodoConvocado.isDynamic())
+			throw new ErrorSemantico(t.getNroLinea()+" : no se puede llamar a un metodo dinamico dentro de un metodo estatico"
+					+"\n\n[Error:"+metodoConvocado.getNombre()+"|"+
+					t.getNroLinea()+"]");
+		
+		
 		chequearArgumentos(metodoConvocado,clase,metodo);
 		if(this.encadenado!=null){
 		

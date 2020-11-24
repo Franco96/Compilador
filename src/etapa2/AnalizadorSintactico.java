@@ -352,9 +352,9 @@ public class AnalizadorSintactico {
 	
 	
 	private Bloque bloque() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
-		Token aux = tokenActual;
+		
 		match("T_llavesIni","{");
-		Bloque bloque = new Bloque(aux);
+		Bloque bloque = new Bloque();
 		TablaDeSimbolos.getTablaDeSimbolos().setBloqueActual(bloque);
 		listaSentencias();
 		match("T_llavesFin","}");
