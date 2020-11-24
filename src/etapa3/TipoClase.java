@@ -13,4 +13,18 @@ public TipoClase(Token t){
 		
 	}
 
+public boolean conforma(Tipo c){
+	if (c instanceof TipoNull || nombre.equals("Object"))
+		return true;
+
+	if (c instanceof TipoClase){
+		Clase clase = TablaDeSimbolos.getTablaDeSimbolos().getClases().get(c.getNombre());
+		Clase thisClass = TablaDeSimbolos.getTablaDeSimbolos().getClases().get(this.nombre);
+		
+		
+		return thisClass.esAncestro(clase.getNombre());
+	}
+	return false;
+}
+
 }

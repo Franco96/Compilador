@@ -1,5 +1,10 @@
 package etapa4;
 
+import Excepciones.ErrorSemantico;
+import etapa3.Clase;
+import etapa3.Metodo;
+import etapa3.TipoBoolean;
+
 public class SentenciaWhile extends Sentencia{
 
 	private Expresion condicion;
@@ -10,6 +15,20 @@ public class SentenciaWhile extends Sentencia{
 
 		this.condicion = condicion;
 		this.cuerpoWhile = cuerpoWhile;
+	}
+
+
+	@Override
+	public void controlSentencia(Clase clase, Metodo metodo)
+			throws ErrorSemantico {
+		
+		if(!(condicion.chequear(clase, metodo) instanceof TipoBoolean))
+			throw new ErrorSemantico(condicion.getLinea()+" : la condicion del while \""+condicion.getNombre()+"\" debe ser de tipo booleana "
+					+"\n\n[Error:"+condicion.getNombre()+"|"+
+					condicion.getLinea()+"]");
+		
+		cuerpoWhile.controlSentencia(clase, metodo);
+		
 	}
 	
 	

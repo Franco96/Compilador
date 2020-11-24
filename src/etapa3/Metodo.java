@@ -3,9 +3,13 @@ package etapa3;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import Excepciones.ErrorSemantico;
 import etapa1.Token;
+import etapa4.AccesoThis;
 import etapa4.Bloque;
+import etapa4.Sentencia;
+import etapa4.SentenciaLlamada;
 
 
 
@@ -15,8 +19,10 @@ public class Metodo {
 	private String forma;
 	private Tipo tipoRetorno;
 	private Map<String, Parametro> params;
+	private Map<String,Variable> varLocales;
 	private int linea;
 	private Bloque bloque;
+	private boolean isChequeado;
 	
 	
 	public Metodo(Token t, String forma, Tipo tipoRetorno) {
@@ -24,9 +30,11 @@ public class Metodo {
 		nombre = t.getLexema();
 		linea = t.getNroLinea();
 		params = new HashMap<String, Parametro>();
+		varLocales = new HashMap<String, Variable>();
 		this.forma = forma;
 		this.tipoRetorno = tipoRetorno;
 		this.bloque = new Bloque(t);
+		isChequeado = false;
 		
 	}
 	
@@ -50,6 +58,10 @@ public class Metodo {
 	public Map<String, Parametro> getParametros() {
 		return params;
 	}
+	public Map<String, Variable> getVariablesLocales() {
+		return this.varLocales;
+	}
+	
 	
 	public boolean isDynamic() {
 		return forma.equals("dynamic");
@@ -68,6 +80,15 @@ public class Metodo {
 		return bloque;
 	}
 	
+	public boolean isChequeado() {
+		return isChequeado;
+	}
+
+	public void setChequeado(boolean isChequeado) {
+		this.isChequeado = isChequeado;
+	}
+
+
 	public Parametro getParametro(int indice){
 		
 		Parametro toReturn = null;
@@ -90,6 +111,18 @@ public class Metodo {
 			throw new ErrorSemantico(p.getLinea()+" : ya existe un parametro con el mismo nombre \""+p.getNombre()+"\""
 					+"\n\n[Error:"+p.getNombre()+"|"+
 					p.getLinea()+"]");
+	}
+	
+	public void insertarVariable(Variable v) throws ErrorSemantico{
+		
+		if(!params.containsKey(v.getNombre()) && !varLocales.containsKey(v.getNombre()))
+				varLocales.put(v.getNombre(), v);
+		
+		else
+			throw new ErrorSemantico(v.getLinea()+" : ya existe una variable o un parametro con el mismo nombre \""+v.getNombre()+"\""+" en el metodo \""+this.nombre+"\""
+					+"\n\n[Error:"+v.getNombre()+"|"+
+					v.getLinea()+"]");
+			
 	}
 
 	
@@ -157,6 +190,31 @@ public class Metodo {
 		}
 		
 	}
+	
+	public void controlSentencia(Clase clase) throws ErrorSemantico{
+		
+		if(this.isStatic()){
+			
+			for( Sentencia sent : bloque.getSentencias()){
+				
+					if(sent instanceof SentenciaLlamada){
+					
+						if(((SentenciaLlamada) sent).getAcceo() instanceof AccesoThis){
+							
+						}
+					}
+			}
+			
+		}
+		
+		
+		bloque.controlSentencias(clase,this);
+		
+	}
+	
+	
+	
+	
 	
 	
 }

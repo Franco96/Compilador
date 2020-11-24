@@ -10,7 +10,10 @@ public class TipoVoid extends Tipo{
 		nombre = "void";
 	
 		
-		
 	}
 		
+	
+	 public boolean conforma(Tipo c) {
+         return c instanceof TipoVoid;
+ }
 }

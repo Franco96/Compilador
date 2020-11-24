@@ -4,25 +4,23 @@ import Excepciones.ErrorSemantico;
 import etapa3.Clase;
 import etapa3.Metodo;
 
+public class SentenciaReturn extends Sentencia{
 
+	private Expresion exp;
 
-public class SentenciaBloque extends Sentencia{
+	public SentenciaReturn(Expresion exp) {
 	
-	private Bloque b;
-
-	public SentenciaBloque(Bloque b) {
-		this.b=b;
+		this.exp = exp;
 	}
-
-
 
 	@Override
 	public void controlSentencia(Clase clase, Metodo metodo)
 			throws ErrorSemantico {
-		b.controlSentencias(clase, metodo);
+		// TODO Auto-generated method stub
 		
 	}
-
 	
-
+	
+	
+	
 }

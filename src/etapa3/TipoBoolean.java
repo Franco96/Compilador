@@ -10,5 +10,9 @@ public class TipoBoolean extends Tipo{
 		nombre = "boolean";
 		
 	}
+	
+	 public boolean conforma(Tipo c) {
+         return c instanceof TipoBoolean;
+ }
 
 }

@@ -34,6 +34,7 @@ public class Principal {
 							anSic.inicial();
 							
 							TablaDeSimbolos.getTablaDeSimbolos().controlDeclaracion();
+							TablaDeSimbolos.getTablaDeSimbolos().controlSentencia();
 							
 							System.out.println("Compilacion Exitosa\n\n[SinErrores]");
 							

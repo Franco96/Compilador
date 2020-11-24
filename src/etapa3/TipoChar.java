@@ -8,9 +8,11 @@ public TipoChar(int linea){
 		
 		super(linea);
 		nombre = "char";
-		
-		
-		
+			
 	}
+
+public boolean conforma(Tipo c) {
+    return c instanceof TipoChar;
+}
 
 }

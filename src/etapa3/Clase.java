@@ -153,7 +153,7 @@ public class Clase {
 		//Chequeo para los parametros del constructor
 				
 				if(constructor==null){
-					constructor = new Metodo(new Token("idClase",nombre , 0),"dynamic" , new TipoVoid(0));
+					constructor = new Metodo(new Token("idClase",nombre , 0),"dynamic" , new TipoClase(new Token("idClase", this.nombre, 0)));
 				}
 				else	
 				constructor.controlDeclaracion();
@@ -256,4 +256,41 @@ public class Clase {
 	}
 	
 	
-}
+	public boolean esAncestro(String c){
+		
+		if (this.nombre.equals("Object"))
+			return false;
+		
+		if (this.nombre.equals(c))
+			return true;
+		
+		Clase claseAncestro = TablaDeSimbolos.getTablaDeSimbolos().getClases().get(hereda.getLexema());
+		
+		return claseAncestro.esAncestro(c);
+		
+	}
+	
+	public void controlSentencia() throws ErrorSemantico{
+		
+		// clases predefinidas Object y System no se controlan
+				if (nombre.equals("Object") || nombre.equals("System"))
+				return;
+		
+		constructor.controlSentencia(this);
+		
+		
+		for(Metodo metodo : metodos.values()){
+			
+				if(!metodo.isChequeado()){
+					metodo.controlSentencia(this);
+					metodo.setChequeado(true);
+				}
+		}
+		}
+		
+		
+	}
+	
+	
+	
+

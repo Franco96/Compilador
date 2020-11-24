@@ -102,6 +102,18 @@ public class TablaDeSimbolos {
 		mainDeclarado();
 	}
 	
+	public void controlSentencia() throws ErrorSemantico {
+		
+	
+		
+		for (Clase c : clases.values()) {
+			c.controlSentencia();
+		}
+		
+
+	}
+	
+	
 	
 	private void mainDeclarado() throws ErrorSemantico{
 		

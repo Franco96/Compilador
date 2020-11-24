@@ -11,7 +11,11 @@ public TipoString(int linea){
 		nombre = "String";
 		
 		
-		
+	}
+
+
+	public boolean conforma(Tipo c) {
+		return c instanceof TipoString;
 	}
 
 }

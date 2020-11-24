@@ -3,8 +3,6 @@ package etapa2;
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.swing.tree.VariableHeightLayoutCache;
-
 import Excepciones.*;
 import etapa1.*;
 import etapa3.*;
@@ -166,7 +164,7 @@ public class AnalizadorSintactico {
 	private void constructor()throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		Token aux = tokenActual;
 		match("idClase","identificador de clase");
-		ts.getClaseActual().insertarConstructor(aux, new TipoVoid(aux.getNroLinea()));
+		ts.getClaseActual().insertarConstructor(aux, new TipoClase(aux));
 		ts.setMetodoActual(ts.getClaseActual().getConstructor());
 		argsFormales();
 		Bloque bloque = bloque();
@@ -353,7 +351,7 @@ public class AnalizadorSintactico {
 	}
 	
 	
-	private Bloque bloque() throws ErrorSintactico, IOException, ErrorLexico{
+	private Bloque bloque() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		Token aux = tokenActual;
 		match("T_llavesIni","{");
 		Bloque bloque = new Bloque(aux);
@@ -364,7 +362,7 @@ public class AnalizadorSintactico {
 	}
 	
 	
-	private void listaSentencias() throws ErrorSintactico, IOException, ErrorLexico{
+	private void listaSentencias() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
 		
 		
@@ -374,6 +372,8 @@ public class AnalizadorSintactico {
 			
 						Sentencia sentencia = null;
 					    sentencia = sentencia();
+					    
+					    if(sentencia!=null)
 					    TablaDeSimbolos.getTablaDeSimbolos().getBloqueActual().addSent(sentencia);
 						listaSentencias();
 		
@@ -390,7 +390,7 @@ public class AnalizadorSintactico {
 	}
 	
 	
-	private Sentencia sentencia() throws ErrorSintactico, IOException, ErrorLexico{
+	private Sentencia sentencia() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 				
 				Sentencia sent=null;
 				
@@ -455,8 +455,9 @@ public class AnalizadorSintactico {
 										
 					case "T_Return": 
 						 				match("T_Return","palabra clave return");
-						 				expresionOVacio();
+						 				Expresion exp = expresionOVacio();
 						 				match("T_PyC",";");
+						 				sent = new SentenciaReturn(exp);
 						 				break;
 						 				
 					default :
@@ -472,7 +473,7 @@ public class AnalizadorSintactico {
 	}
 	
 	
-	private Sentencia conOsinElse() throws ErrorSintactico, IOException, ErrorLexico{
+	private Sentencia conOsinElse() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
 		Sentencia sent = null;
 		
@@ -485,17 +486,17 @@ public class AnalizadorSintactico {
 	}
 	
 	
-	private void listaDeVars(Tipo tipo) throws ErrorSintactico, IOException, ErrorLexico{
+	private void listaDeVars(Tipo tipo) throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 			
 			Token id = tokenActual;
 			match("idMetVar","identificador de metodo o variable");
 			Variable var = new Variable(id, tipo);
-			TablaDeSimbolos.getTablaDeSimbolos().getBloqueActual().addVar(var);
+			TablaDeSimbolos.getTablaDeSimbolos().getMetodoActual().insertarVariable(var);
 			listaDeVarsAux(tipo);
 			
 	}
 	
-	private void listaDeVarsAux(Tipo tipo) throws ErrorSintactico, IOException, ErrorLexico{
+	private void listaDeVarsAux(Tipo tipo) throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
 		if(esIgual("T_coma")){
 			match("T_coma",",");
@@ -695,12 +696,14 @@ public class AnalizadorSintactico {
 	
 	
 
-	private void expresionOVacio() throws ErrorSintactico, IOException, ErrorLexico{
+	private Expresion expresionOVacio() throws ErrorSintactico, IOException, ErrorLexico{
+		
+		Expresion exp = null;
 		
 		if(Arrays.asList("op+","op-","op!","LitNull","LitBoolean","LitEntero","LitCaracter","LitString"
 						,"T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
 		
-				expresion();
+				exp = expresion();
 		
 		}if (esIgual("T_PyC")){
 			 //epsilon no se hace nada
@@ -710,6 +713,10 @@ public class AnalizadorSintactico {
 					+"\n\n[Error:"+tokenActual.getLexema()+"|"+
 						tokenActual.getNroLinea()+"]");
 		}
+		
+		return exp;
+		
+		
 	
 	}
 	
