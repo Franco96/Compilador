@@ -1,5 +1,6 @@
 package etapa2;
 
+import java.io.File;
 import java.io.IOException;
 
 import Excepciones.ErrorLexico;
@@ -7,6 +8,7 @@ import Excepciones.ErrorSemantico;
 import Excepciones.ErrorSintactico;
 import etapa1.*;
 import etapa3.*;
+import etapa5.GCI;
 
 
 public class Principal {
@@ -22,6 +24,13 @@ public class Principal {
 					GestorDeArchivo gestorDeFuente;
 		
 					try {
+							File f = new File(".//");
+							
+							GCI.path = f.getCanonicalPath()+ System.getProperty("file.separator") +"salidaMio.txt";
+							
+							GCI.gen();
+							
+							
 							//Vacia la tabla de simbolos por si de ejecucion en ejecucion del main no se vacia
 							TablaDeSimbolos.getTablaDeSimbolos().limpiar(); 
 			
@@ -38,7 +47,7 @@ public class Principal {
 							
 							System.out.println("Compilacion Exitosa\n\n[SinErrores]");
 							
-						
+							GCI.gen().close();
 							
 					} catch (IOException e) {
 						e.printStackTrace();

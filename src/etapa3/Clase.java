@@ -237,15 +237,16 @@ public class Clase {
 				
 						Atributo heredado = clasePadre.getAtributos().get(claveHeredado);
 						
+						if(heredado.getVisibilidad().equals("public")){
 							
-						if(claveHeredado.contains("super.")){
-							//No hace nada porque se esta soobreescribiendo un atributo en la clase padre
+							if(claveHeredado.contains("super.")){
+								//No hace nada porque se esta soobreescribiendo un atributo en la clase padre
 						
-						}else if(atributos.get(claveHeredado)==null){
-							atributos.put(claveHeredado, heredado);
-						}else
-							atributos.put("super."+claveHeredado, heredado);
-							
+							}else if(atributos.get(claveHeredado)==null){
+								atributos.put(claveHeredado, heredado);
+							}else
+								atributos.put("super."+claveHeredado, heredado);
+						}	
 				}
 					
 
@@ -272,10 +273,11 @@ public class Clase {
 	
 	public void controlSentencia() throws ErrorSemantico{
 		
-		// clases predefinidas Object y System no se controlan
-				if (nombre.equals("Object") || nombre.equals("System"))
+		// clases predefinida Object no se controlan
+				if (nombre.equals("Object")) 
 				return;
-		
+				
+		if(!nombre.equals("System"))
 		constructor.controlSentencia(this);
 		
 		

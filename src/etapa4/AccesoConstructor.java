@@ -10,10 +10,11 @@ import etapa3.Tipo;
 
 public class AccesoConstructor extends AccesoMetodo {
 
+	
 	public AccesoConstructor(Token t) {
-		super(t);
-		
+		super(t);	
 	}
+	
 	
 	@Override
 	public Tipo chequear(Clase clase,Metodo metodo) throws ErrorSemantico {
@@ -29,8 +30,7 @@ public class AccesoConstructor extends AccesoMetodo {
 		chequearArgumentos(claseConstructor.getConstructor(), clase , metodo);
 		
 		if(this.encadenado!=null)		
-					return this.encadenado.chequear(claseConstructor,metodo);
-		
+			 return this.encadenado.chequear(claseConstructor,metodo);
 		else
 			 return claseConstructor.getConstructor().getTipoRetorno();
 		

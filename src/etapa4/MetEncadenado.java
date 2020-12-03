@@ -43,17 +43,15 @@ public class MetEncadenado extends Encadenado{
 		
 		if(this.siguiente!=null){
 			
-			
-			
 			Clase claseRetorno = TablaDeSimbolos.getTablaDeSimbolos().getClases().get(metodoConvocado.getTipoRetorno().getNombre());
 			
 			if(claseRetorno!=null)
 					return this.siguiente.chequear(claseRetorno,metodo);
-			else{
+			else
 				throw new ErrorSemantico(linea+" : el metodo \""+nombreMetodo+"\""+" deberia retornar una clase que contenga el metodo \""+siguiente.getNombre()+"\""
 						+"\n\n[Error:"+nombreMetodo+"|"+
 						linea+"]");
-			}
+			
 			
 		}else
 			 return metodoConvocado.getTipoRetorno();

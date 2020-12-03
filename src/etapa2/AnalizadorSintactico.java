@@ -392,7 +392,7 @@ public class AnalizadorSintactico {
 	
 	private Sentencia sentencia() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 				
-				Sentencia sent=null;
+				Sentencia sent;
 				
 			
 				switch(tokenActual.getToken()){
@@ -423,6 +423,7 @@ public class AnalizadorSintactico {
 										Tipo tipo = tipo();
 										listaDeVars(tipo);
 										match("T_PyC",";");
+										sent = new SentenciaDeclaracionVar();
 										break;
 					
 					case "T_If":

@@ -42,15 +42,12 @@ public class VarEncadenada extends Encadenado{
 			
 			if(claseRetorno!=null)
 				  return this.siguiente.chequear(claseRetorno,metodo);
-			else{
+			else
 					throw new ErrorSemantico(linea+" : la variable \""+nombreAtribLlamada+"\""+" "
 							+ "deberia retornar una clase que contenga el metodo o variable \""+siguiente.getNombre()+"\""
-					
-					+"\n\n[Error:"+nombreAtribLlamada+"|"+
-					linea+"]");
-			}
-			
-			
+							+"\n\n[Error:"+nombreAtribLlamada+"|"+
+							linea+"]");
+	
 		}else
 			 return atributoEnca.getTipo();	
 		

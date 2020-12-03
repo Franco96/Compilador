@@ -6,7 +6,6 @@ import java.util.Map;
 
 import Excepciones.ErrorSemantico;
 import etapa1.Token;
-
 import etapa4.Bloque;
 
 
@@ -192,6 +191,29 @@ public class Metodo {
 	
 	public void controlSentencia(Clase clase) throws ErrorSemantico{
 		
+		
+	if(! (clase.getNombre().equals("System")) ){	
+		
+		for (Variable variable : this.varLocales.values()) {
+			
+			if (variable.getTipo() instanceof TipoClase){
+					
+				if(TablaDeSimbolos.getTablaDeSimbolos().getClases().get(variable.getTipo().getNombre())==null){
+					
+						throw new ErrorSemantico(variable.getLinea()+" : la clase \""+variable.getTipo().getNombre()+"\" no fue declarada"
+								+"\n\n[Error:"+variable.getTipo().getNombre()+"|"+
+								variable.getLinea()+"]");
+					}
+			}
+		}
+		
+		if(!clase.getNombre().equals(this.getNombre())) //chequeo que no sea el constructor
+				if(!(this.tipoRetorno instanceof TipoVoid) && !(bloque.tieneRetorno()))
+						throw new ErrorSemantico(this.getLinea()+" : el metodo \""+this.getNombre()+"\" deberia retornar un tipo \""+tipoRetorno.getNombre()+"\""
+								+"\n\n[Error:"+this.getNombre()+"|"+
+								this.getLinea()+"]");
+		
+	}
 				
 		bloque.controlSentencias(clase,this);
 		

@@ -1,7 +1,9 @@
 package etapa3;
 
+
 import Excepciones.ErrorSemantico;
 import etapa1.Token;
+import etapa4.BloqueSystem;
 
 public class CSystem {
 
@@ -15,6 +17,7 @@ public class CSystem {
 		Clase clase = new Clase(new Token("idClase", "System", 0)); 
 				
 		clase.setHereda(new Token("idClase","Object",0));
+		
 		     
 		
 		 Metodo read = new Metodo(new Token("idMetVar", "read", 0), "static", new TipoInt(0));
@@ -36,6 +39,31 @@ public class CSystem {
 		 Metodo printSln = new Metodo(new Token("idMetVar", "printSln", 0), "static", new TipoVoid(0));	
 		 printSln.insertarParametros(new Parametro(new Token("idMetVar","s",0), new TipoString(0), 0));	
 		
+		 
+		 	String imp_read = "READ\nSTORE 3";
+			String imp_printB = "LOAD 3\nBPRINT";
+			String imp_printI = "LOAD 3\nIPRINT";
+			String imp_printC = "LOAD 3\nCPRINT";
+			String imp_printS = "LOAD 3\nSPRINT";
+			String imp_println = "PRNLN";
+			String imp_printBln = imp_printB + '\n' + imp_println;
+			String imp_printIln = imp_printI + '\n' + imp_println;
+			String imp_printCln = imp_printC + '\n' + imp_println;
+			String imp_printSln = imp_printS + '\n' + imp_println;
+
+			read.setBloque(new BloqueSystem(imp_read));
+			printB.setBloque(new BloqueSystem(imp_printB));
+			printI.setBloque(new BloqueSystem(imp_printI));
+			printC.setBloque(new BloqueSystem(imp_printC));
+			printS.setBloque(new BloqueSystem(imp_printS));
+			println.setBloque(new BloqueSystem(imp_println));
+			printBln.setBloque(new BloqueSystem(imp_printBln));
+			printIln.setBloque(new BloqueSystem(imp_printIln));
+			printCln.setBloque(new BloqueSystem(imp_printCln));
+			printSln.setBloque(new BloqueSystem(imp_printSln));
+		 
+		 
+		 
 		 clase.insetarMetodo(read);
 		 clase.insetarMetodo(printB);
 		 clase.insetarMetodo(printC);

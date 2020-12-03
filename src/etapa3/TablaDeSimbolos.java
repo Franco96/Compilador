@@ -1,11 +1,13 @@
 package etapa3;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import Excepciones.ErrorSemantico;
 import etapa1.Token;
 import etapa4.Bloque;
+import etapa5.GCI;
 
 
 
@@ -104,7 +106,10 @@ public class TablaDeSimbolos {
 	
 	public void controlSentencia() throws ErrorSemantico {
 		
-	
+		/* Protocolo de inicializacion */
+		Date d = new Date();
+		
+		GCI.gen().comment("# Codigo genenerado por el compilador minijava");
 		
 		for (Clase c : clases.values()) {
 			c.controlSentencia();

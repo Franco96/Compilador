@@ -20,10 +20,7 @@ public class AccesoMetodo extends Acceso{
 	
 	
 	public void addArgumentos(Expresion sent) {
-		this.argumentos.add(sent);
-
-		
-		
+		this.argumentos.add(sent);		
 	}
 
 
@@ -33,35 +30,41 @@ public class AccesoMetodo extends Acceso{
 		Metodo metodoConvocado = clase.getMetodos().get(t.getLexema());
 		
 		if(metodoConvocado==null){
-			throw new ErrorSemantico(t.getNroLinea()+" : no existe un metodo con el nombre \""+t.getLexema()+"\""+" definido en la clase \""+clase.getNombre()+"\""
+			throw new ErrorSemantico(t.getNroLinea()+" : no existe un metodo con el nombre \""+t.getLexema()+"\""+" "
+					+ "definido en la clase \""+clase.getNombre()+"\""
 					+"\n\n[Error:"+t.getLexema()+"|"+
 					t.getNroLinea()+"]");
 		}
 		
 		if(metodo.isStatic()&& metodoConvocado.isDynamic())
-			throw new ErrorSemantico(t.getNroLinea()+" : no se puede llamar a un metodo dinamico dentro de un metodo estatico"
+			throw new ErrorSemantico(t.getNroLinea()+" : no se puede llamar a un metodo dinamico dentro de un "
+					+ "metodo estatico"
 					+"\n\n[Error:"+metodoConvocado.getNombre()+"|"+
 					t.getNroLinea()+"]");
 		
 		
 		chequearArgumentos(metodoConvocado,clase,metodo);
+		
 		if(this.encadenado!=null){
 		
-			
 			Clase claseRetorno = TablaDeSimbolos.getTablaDeSimbolos().getClases().get(metodoConvocado.getTipoRetorno().getNombre());
 			
 			if(claseRetorno!=null)
 					return this.encadenado.chequear(claseRetorno,metodo);//Le paso la clase que retorna el metodo y el metodo donde se convoca el encadenado
-			else{
-				throw new ErrorSemantico(t.getNroLinea()+" : el metodo \""+t.getLexema()+"\""+" deberia retornar una clase que contenga el metodo \""+encadenado.getNombre()+"\""
-						+"\n\n[Error:"+t.getLexema()+"|"+
-						t.getNroLinea()+"]");
-			}
+			else
+					throw new ErrorSemantico(t.getNroLinea()+" : el metodo \""+t.getLexema()+"\""+" "
+							+ "deberia retornar una clase que contenga el metodo \""+encadenado.getNombre()+"\""
+							+"\n\n[Error:"+t.getLexema()+"|"+
+							t.getNroLinea()+"]");
+			
 		
 		}else
 			 return metodoConvocado.getTipoRetorno();
+	
 	}		
 
+	
+	
 	
 	protected void chequearArgumentos(Metodo metodoConvocado,Clase clase,Metodo metodo) throws ErrorSemantico{
 		
@@ -77,7 +80,6 @@ public class AccesoMetodo extends Acceso{
 			
 			Tipo tipoArgActual = this.argumentos.get(i).chequear(clase, metodo);
 			
-			
 			if(!tipoArgActual.conforma(tipoArgFormal))
 				
 				throw new ErrorSemantico(t.getNroLinea()+" : el parametro actual numero \""+(i+1)+"\" del metodo/constructor "
@@ -86,9 +88,7 @@ public class AccesoMetodo extends Acceso{
 						t.getNroLinea()+"]");
 			
 		}
-		
-		
-		
+			
 		
 	}
 	

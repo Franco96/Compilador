@@ -33,7 +33,29 @@ public void controlSentencia(Clase clase, Metodo metodo) throws ErrorSemantico {
 		cuerpoElse.controlSentencia(clase, metodo);
 }
 	
+public boolean tieneRetorno(){
 	
+	boolean retornoCuerpoIf = false;
+	boolean retornoCuerpoElse = false;
+	
+	if(cuerpoIf instanceof SentenciaReturn)
+		retornoCuerpoIf = true;
+	if(cuerpoIf instanceof SentenciaBloque)
+		retornoCuerpoIf = ((SentenciaBloque) cuerpoIf).tieneRetorno();
+	if(cuerpoIf instanceof SentenciaIf)
+		retornoCuerpoIf = ((SentenciaIf) cuerpoIf).tieneRetorno();
+	
+	
+	if(cuerpoElse instanceof SentenciaReturn)
+		retornoCuerpoElse = true;
+	if(cuerpoElse instanceof SentenciaBloque)
+		retornoCuerpoElse = ((SentenciaBloque) cuerpoElse).tieneRetorno();
+	if(cuerpoElse instanceof SentenciaIf)
+		retornoCuerpoElse = ((SentenciaIf) cuerpoElse).tieneRetorno();
+	
+	
+	return retornoCuerpoIf && retornoCuerpoElse;
+}
 
 	
 }

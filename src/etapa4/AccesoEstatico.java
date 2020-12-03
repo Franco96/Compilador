@@ -41,9 +41,7 @@ public class AccesoEstatico extends Acceso{
 										this.actMet.chequearArgumentos(met, clase, metodo);
 										
 											if(encadenado!=null){
-												
-												
-												
+														
 												Clase claseRetorno = TablaDeSimbolos.getTablaDeSimbolos().getClases().get(met.getTipoRetorno().getNombre());
 											
 												if(claseRetorno!= null)
