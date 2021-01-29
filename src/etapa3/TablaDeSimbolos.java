@@ -71,8 +71,9 @@ public class TablaDeSimbolos {
 		return clases;
 	}
 
-	private void insetarClaseObject() {
+	private void insetarClaseObject() throws ErrorSemantico {
 		Clase c = new Clase(new Token("idClase","Object",0));	
+		c.insertarConstructor(new Token("idClase", c.getNombre(), 0),  new TipoClase(new Token("idClase", c.getNombre(), 0)));
 		clases.put("Object", c);
 
 	}
@@ -109,7 +110,7 @@ public class TablaDeSimbolos {
 		/* Protocolo de inicializacion */
 		Date d = new Date();
 		
-		GCI.gen().comment("# Codigo genenerado por el compilador minijava");
+		//GCI.gen().comment("# Codigo genenerado por el compilador minijava");
 		
 		for (Clase c : clases.values()) {
 			c.controlSentencia();

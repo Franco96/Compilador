@@ -21,8 +21,9 @@ public class BloqueSystem extends Bloque{
 		String[]  simp = implementacion.split("\n");
 		
 		
-		for (String s : simp)
-			GCI.gen().gen(s,"");
+		//for (String s : simp)
+		
+		//GCI.gen().gen(s,"");
 		
 		
 	}

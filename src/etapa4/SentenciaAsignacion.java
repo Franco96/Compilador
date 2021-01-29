@@ -57,12 +57,12 @@ public class SentenciaAsignacion extends Sentencia{
 		case "-=":
 					if( !(tipoLadoIzq instanceof TipoInt) || !(tipoLadoDer instanceof TipoInt))
 						throw new ErrorSemantico(tipoAsignacio.getNroLinea()+" : el tipo de asinacion \""+this.tipoAsignacio.getLexema()+"\""
-								+ " es incorrecta porque el lado derecho o izquierde no es de tipo entero"
+								+ " es incorrecta porque el lado derecho o izquierdo no es de tipo entero"
 								+"\n\n[Error:"+ladoIzq.getNombre()+"|"+
 								ladoIzq.getLinea()+"]");	
 		
 		case "=":
-					if(!tipoLadoDer.conforma(tipoLadoIzq))
+					if(!tipoLadoIzq.getNombre().equals("Object") && !tipoLadoDer.conforma(tipoLadoIzq))
 						throw new ErrorSemantico(tipoAsignacio.getNroLinea()+" : el tipo \""+tipoLadoDer.getNombre()+"\""
 								+ " no conforma el tipo \""+tipoLadoIzq.getNombre()+"\""
 								+"\n\n[Error:"+ladoIzq.getNombre()+"|"+

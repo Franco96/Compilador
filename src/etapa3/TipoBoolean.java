@@ -12,6 +12,8 @@ public class TipoBoolean extends Tipo{
 	}
 	
 	 public boolean conforma(Tipo c) {
+		 
+		 
          return c instanceof TipoBoolean;
  }
 

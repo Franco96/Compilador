@@ -124,9 +124,12 @@ public class Clase {
 	
 	public void controlDeclaracion() throws ErrorSemantico{
 		
+			
 		// clases predefinidas Object y System no se controlan
-		if (nombre.equals("Object") || nombre.equals("System"))
-		return;
+		if (nombre.equals("Object") || nombre.equals("System"))	
+			return;
+
+		
 		
 	
 		for(Clase c : TablaDeSimbolos.getTablaDeSimbolos().getClases().values())

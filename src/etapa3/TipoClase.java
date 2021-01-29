@@ -14,8 +14,7 @@ public TipoClase(Token t){
 	}
 
 public boolean conforma(Tipo c){
-	if (c instanceof TipoNull || nombre.equals("Object"))
-		return true;
+	
 
 	if (c instanceof TipoClase){
 		Clase clase = TablaDeSimbolos.getTablaDeSimbolos().getClases().get(c.getNombre());

@@ -11,6 +11,7 @@ public class TipoNull extends Tipo{
 
 	//Tipo null conforma con cualquier tipo de clase
 	public boolean conforma(Tipo c){
+		
 		return true;
 	}
 	
