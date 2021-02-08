@@ -32,6 +32,19 @@ public abstract class Encadenado {
 		return token.getLexema();
 	}
 	
+	public Encadenado getUltimoDelEncadenado(){
+		
+		Encadenado encaToReturn = this;
+		
+		
+		while(encaToReturn.getSiguiente()!=null)
+			encaToReturn = encaToReturn.getSiguiente();
+		
+		return encaToReturn;
+		
+	}
+	
+	
 	public abstract Tipo chequear(Clase clase,Metodo metodo) throws ErrorSemantico;
 	
 }

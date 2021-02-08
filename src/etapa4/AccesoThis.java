@@ -21,6 +21,8 @@ public class AccesoThis extends Acceso{
 					+"\n\n[Error:"+t.getLexema()+"|"+
 					t.getNroLinea()+"]");
 		
+		
+		
 		if(this.encadenado!=null)
 			
 			return encadenado.chequear(clase,metodo);

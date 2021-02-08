@@ -12,12 +12,13 @@ import etapa4.Bloque;
 
 
 
+
 public class Metodo {
 	private String nombre;
 	private String forma;
 	private Tipo tipoRetorno;
 	private Map<String, Parametro> params;
-	private Map<String,Variable> varLocales;
+	//private Map<String,Variable> varLocales;
 	private int linea;
 	private Bloque bloque;
 	private boolean isChequeado;
@@ -28,7 +29,8 @@ public class Metodo {
 		nombre = t.getLexema();
 		linea = t.getNroLinea();
 		params = new HashMap<String, Parametro>();
-		varLocales = new HashMap<String, Variable>();
+		
+		//varLocales = new HashMap<String, Variable>();
 		this.forma = forma;
 		this.tipoRetorno = tipoRetorno;
 		this.bloque = new Bloque();
@@ -56,9 +58,12 @@ public class Metodo {
 	public Map<String, Parametro> getParametros() {
 		return params;
 	}
+	
+	/*
 	public Map<String, Variable> getVariablesLocales() {
 		return this.varLocales;
 	}
+	*/
 	
 	
 	public boolean isDynamic() {
@@ -111,6 +116,7 @@ public class Metodo {
 					p.getLinea()+"]");
 	}
 	
+		/*
 	public void insertarVariable(Variable v) throws ErrorSemantico{
 		
 		if(!params.containsKey(v.getNombre()) && !varLocales.containsKey(v.getNombre()))
@@ -122,7 +128,7 @@ public class Metodo {
 					v.getLinea()+"]");
 			
 	}
-
+	 */
 	
 	
 	public void controlDeclaracion() throws ErrorSemantico{
@@ -191,7 +197,7 @@ public class Metodo {
 	
 	public void controlSentencia(Clase clase) throws ErrorSemantico{
 		
-		
+	/*	
 	if(! (clase.getNombre().equals("System")) ){	
 		
 		for (Variable variable : this.varLocales.values()) {
@@ -214,8 +220,22 @@ public class Metodo {
 								this.getLinea()+"]");
 		
 	}
-				
+		*/		
+		
+	/*	
+	if(! (clase.getNombre().equals("System")) )	
+		if(clase.getNombre().equals(this.getNombre())) // si es el constructor
+			if(bloque.tieneRetorno())
+					throw new ErrorSemantico(this.getLinea()+" : el contructor de la clase \""+this.getNombre()+"\" no debe retornar ningun valor"
+							+"\n\n[Error:"+this.getNombre()+"|"+
+							this.getLinea()+"]");
+		*/
+		
+		
 		bloque.controlSentencias(clase,this);
+	
+		
+		
 		
 	}
 	

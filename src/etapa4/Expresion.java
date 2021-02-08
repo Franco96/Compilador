@@ -9,6 +9,7 @@ import etapa3.Tipo;
 public abstract class Expresion {
 	
 	protected Token operador;
+	
 
 	public Token getOperador() {
 		return operador;

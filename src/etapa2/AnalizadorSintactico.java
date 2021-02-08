@@ -167,7 +167,7 @@ public class AnalizadorSintactico {
 		ts.getClaseActual().insertarConstructor(aux, new TipoClase(aux));
 		ts.setMetodoActual(ts.getClaseActual().getConstructor());
 		argsFormales();
-		Bloque bloque = bloque();
+		Bloque bloque = bloque(null);
 		ts.getClaseActual().getConstructor().setBloque(bloque);
 	}
 	
@@ -181,7 +181,7 @@ public class AnalizadorSintactico {
 		Metodo m = new Metodo(aux, formaMetodo, tipo);
 		ts.setMetodoActual(m);
 		argsFormales();
-		Bloque bloque = bloque();
+		Bloque bloque = bloque(null);
 		m.setBloque(bloque);
 		ts.getClaseActual().insetarMetodo(m);	
 	}
@@ -351,10 +351,14 @@ public class AnalizadorSintactico {
 	}
 	
 	
-	private Bloque bloque() throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
+	private Bloque bloque(Bloque bloquePadre) throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
 		match("T_llavesIni","{");
 		Bloque bloque = new Bloque();
+		
+		if(bloquePadre!=null) //Controlo si tiene bloque padre
+		bloque.pasarVarDelBloquePadre(bloquePadre); //Paso las variables del bloque padre
+			
 		TablaDeSimbolos.getTablaDeSimbolos().setBloqueActual(bloque);
 		listaSentencias();
 		match("T_llavesFin","}");
@@ -407,9 +411,9 @@ public class AnalizadorSintactico {
 					case "T_Static":
 					case "T_New":
 					case "T_parenIni":
-										
+										Token tokenError = tokenActual;
 										Acceso acceso = acceso();
-										SentenciaAsignacion senAsig = asignacionOLlamada(acceso);
+										SentenciaAsignacion senAsig = asignacionOLlamada(acceso,tokenError);
 										match("T_PyC",";");
 										
 										sent = (senAsig == null)? new SentenciaLlamada(acceso): senAsig;
@@ -448,8 +452,8 @@ public class AnalizadorSintactico {
 					case "T_llavesIni":
 										Bloque bloqueAux = TablaDeSimbolos.getTablaDeSimbolos().getBloqueActual();
 										
-										Bloque bloque = bloque();
-										
+										Bloque bloque = bloque(bloqueAux);
+				
 										TablaDeSimbolos.getTablaDeSimbolos().setBloqueActual(bloqueAux);
 										sent = new SentenciaBloque(bloque);
 										break;
@@ -492,7 +496,7 @@ public class AnalizadorSintactico {
 			Token id = tokenActual;
 			match("idMetVar","identificador de metodo o variable");
 			Variable var = new Variable(id, tipo);
-			TablaDeSimbolos.getTablaDeSimbolos().getMetodoActual().insertarVariable(var);
+			TablaDeSimbolos.getTablaDeSimbolos().getBloqueActual().insertarVariable(var);
 			listaDeVarsAux(tipo);
 			
 	}
@@ -516,10 +520,11 @@ public class AnalizadorSintactico {
 	
 	
 	
-	private SentenciaAsignacion asignacionOLlamada(Acceso acceso) throws ErrorSintactico, IOException, ErrorLexico{
+	private SentenciaAsignacion asignacionOLlamada(Acceso acceso,Token tokenError) throws ErrorSintactico, IOException, ErrorLexico{
 		 
 		SentenciaAsignacion senAsig = null;
 		
+			
 		
 			if(Arrays.asList("op=","op+=","op-=").contains(tokenActual.getToken())){
 					
@@ -529,6 +534,37 @@ public class AnalizadorSintactico {
 					
 					senAsig = new SentenciaAsignacion(tipoAsig, acceso, exp);
 			}
+			
+		
+			if(senAsig == null){
+			
+			
+					if(acceso instanceof AccesoThis || acceso instanceof AccesoVar){
+				
+							if(acceso.tieneEncadenado()){	
+						
+									Encadenado ultimoElemEncadenado = acceso.getEncadenado().getUltimoDelEncadenado();
+						
+									if( ultimoElemEncadenado instanceof VarEncadenada)
+									
+										throw new ErrorSintactico(tokenActual.getNroLinea()+" : el ultimo elemento del encadenado debe ser una llamada a metodo,"
+												+ " se encontro la variable \""+ultimoElemEncadenado.getNombre()+"\""
+												+"\n\n[Error:"+ultimoElemEncadenado.getNombre()+"|"+
+												tokenError.getNroLinea()+"]");
+		
+							}else
+				
+								throw new ErrorSintactico(tokenActual.getNroLinea()+" : el acceso a variable/this no es una llamada"
+										+ " se encontro \""+tokenError.getLexema()+"\""
+										+"\n\n[Error:"+tokenError.getLexema()+"|"+
+									tokenError.getNroLinea()+"]");
+					
+				
+							
+					}
+			
+			}
+			
 			
 			
 			return senAsig;
@@ -558,7 +594,7 @@ public class AnalizadorSintactico {
 									aux = tokenActual;
 									match("idMetVar","identificador de metodo o variable");
 									AccesoMetodo actMet =  accesoMetOVar(aux); 
-									acceso = (actMet == null)? new AccesoVar(aux) : actMet;
+									acceso = (actMet == null)? new AccesoVar(aux,TablaDeSimbolos.getTablaDeSimbolos().getBloqueActual()) : actMet;
 									break;
 					
 					case "T_Static":

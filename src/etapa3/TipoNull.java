@@ -10,9 +10,10 @@ public class TipoNull extends Tipo{
 	}
 
 	//Tipo null conforma con cualquier tipo de clase
+	//excepto los tipos predefinidos 
 	public boolean conforma(Tipo c){
 		
-		return true;
+		return (c instanceof TipoClase || c instanceof TipoString) ? true : false;
 	}
 	
 }

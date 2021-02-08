@@ -12,10 +12,11 @@ import etapa3.Variable;
 
 public class AccesoVar extends Acceso{
 	
+	Bloque bloque;
 
-
-	public AccesoVar(Token t) {
+	public AccesoVar(Token t,Bloque bloque) {
 		super(t);
+		this.bloque = bloque;
 	}
 
 	@Override
@@ -23,7 +24,7 @@ public class AccesoVar extends Acceso{
 			
 		Parametro param = metodo.getParametros().get(t.getLexema());
 				
-		Variable variable = metodo.getVariablesLocales().get(t.getLexema());
+		Variable variable = bloque.getVariablesLocales().get(t.getLexema());
 		
 		Atributo atrib = clase.getAtributos().get(t.getLexema());
 		
