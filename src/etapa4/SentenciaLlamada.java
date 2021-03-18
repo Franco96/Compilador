@@ -22,6 +22,13 @@ public class SentenciaLlamada extends Sentencia{
 		acceso.chequear(clase,metodo);
 	
 	}
+
+	@Override
+	public void generarCodigo() {
+		
+		acceso.generarCodigo();
+		
+	}
 	
 	
 	

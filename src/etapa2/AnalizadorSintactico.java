@@ -2,6 +2,8 @@ package etapa2;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import Excepciones.*;
 import etapa1.*;
@@ -178,7 +180,7 @@ public class AnalizadorSintactico {
 		Tipo tipo = tipoMetodo();
 		Token aux = tokenActual;
 		match("idMetVar","identificador de metodo o variable");
-		Metodo m = new Metodo(aux, formaMetodo, tipo);
+		Metodo m = new Metodo(aux, formaMetodo, tipo,ts.getClaseActual().getNombre());
 		ts.setMetodoActual(m);
 		argsFormales();
 		Bloque bloque = bloque(null);
@@ -425,9 +427,10 @@ public class AnalizadorSintactico {
 					case "T_Int":
 					case "T_String":
 										Tipo tipo = tipo();
-										listaDeVars(tipo);
+										List<Variable> variablesLocales = new LinkedList<Variable>();
+										listaDeVars(tipo,variablesLocales);
 										match("T_PyC",";");
-										sent = new SentenciaDeclaracionVar();
+										sent = new SentenciaDeclaracionVar(variablesLocales);
 										break;
 					
 					case "T_If":
@@ -491,21 +494,22 @@ public class AnalizadorSintactico {
 	}
 	
 	
-	private void listaDeVars(Tipo tipo) throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
+	private void listaDeVars(Tipo tipo,List<Variable> variablesLocales) throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 			
 			Token id = tokenActual;
 			match("idMetVar","identificador de metodo o variable");
 			Variable var = new Variable(id, tipo);
+			variablesLocales.add(var);
 			TablaDeSimbolos.getTablaDeSimbolos().getBloqueActual().insertarVariable(var);
-			listaDeVarsAux(tipo);
+			listaDeVarsAux(tipo,variablesLocales);
 			
 	}
 	
-	private void listaDeVarsAux(Tipo tipo) throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
+	private void listaDeVarsAux(Tipo tipo,List<Variable> variablesLocales) throws ErrorSintactico, IOException, ErrorLexico, ErrorSemantico{
 		
 		if(esIgual("T_coma")){
 			match("T_coma",",");
-			listaDeVars(tipo);
+			listaDeVars(tipo,variablesLocales);
 		}else if(esIgual("T_PyC")){
 			//epsilon no se hace nada
 		}else{
@@ -551,6 +555,7 @@ public class AnalizadorSintactico {
 												+ " se encontro la variable \""+ultimoElemEncadenado.getNombre()+"\""
 												+"\n\n[Error:"+ultimoElemEncadenado.getNombre()+"|"+
 												tokenError.getNroLinea()+"]");
+									
 		
 							}else
 				

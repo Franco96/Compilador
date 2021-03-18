@@ -7,6 +7,7 @@ import etapa3.Metodo;
 import etapa3.Tipo;
 import etapa3.TipoBoolean;
 import etapa3.TipoInt;
+import etapa5.Generador;
 
 public class ExpresionBinaria extends Expresion{
 
@@ -69,6 +70,62 @@ public Tipo chequear(Clase clase, Metodo metodo) throws ErrorSemantico {
 	}
 	
 	return null;
+}
+
+
+@Override
+public void generarCodigo() {
+	
+	ladoIzquierdo.generarCodigo();
+	
+	ladoDerecho.generarCodigo();
+			
+	
+	switch (operador.getLexema()) {
+	
+		case "+":
+				Generador.getGenerador().gen("ADD","");
+				break;
+		case "-":
+				Generador.getGenerador().gen("SUB","");
+				break;
+		case "*":
+				Generador.getGenerador().gen("MUL","");
+				break;
+		case "/":
+				Generador.getGenerador().gen("DIV", "# Division");
+				break;
+		case "%":
+				Generador.getGenerador().gen("MOD", "# Modulo");
+				break;
+		case "&&":
+				Generador.getGenerador().gen("AND","");
+				break;
+		case "||":
+				Generador.getGenerador().gen("OR","");
+				break;
+		case ">":
+				Generador.getGenerador().gen("GT", "# Mayor");
+				break;
+		case "<":
+				Generador.getGenerador().gen("LT", "# Menor");
+				break;
+		case ">=":
+				Generador.getGenerador().gen("GE", "# Mayor o igual");
+				break;
+		case "<=":
+				Generador.getGenerador().gen("LE", "# Menor o igual");
+				break;
+		case "==":
+				Generador.getGenerador().gen("EQ", "# Igualdad \"==\"");
+				break;
+		case "!=":
+				Generador.getGenerador().gen("NE", "# Desiguialdad \"!=\" ");
+				break;
+	
+	
+	}
+	
 }
 	
 

@@ -1,10 +1,14 @@
 package etapa3;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import Excepciones.ErrorSemantico;
 import etapa1.Token;
+import etapa5.Generador;
+
 
 
 
@@ -33,7 +37,8 @@ public class Clase {
 		metodos = new HashMap<String, Metodo>();
 		constructor = null;
 		chequeada = false;
-		}
+	
+	}
 
 
 	public String getNombre() {
@@ -103,7 +108,7 @@ public class Clase {
 					t.getNroLinea()+"]");
 	
 		
-		constructor = new Metodo(t, "dynamic", tipo);
+		constructor = new Metodo(t, "dynamic", tipo,this.nombre);
 	}
 	
 	
@@ -156,7 +161,7 @@ public class Clase {
 		//Chequeo para los parametros del constructor
 				
 				if(constructor==null){
-					constructor = new Metodo(new Token("idClase",nombre , 0),"dynamic" , new TipoClase(new Token("idClase", this.nombre, 0)));
+					constructor = new Metodo(new Token("idClase",nombre , 0),"dynamic" , new TipoClase(new Token("idClase", this.nombre, 0)),this.nombre);
 				}
 				else	
 				constructor.controlDeclaracion();
@@ -185,6 +190,29 @@ public class Clase {
 		
 		return false;
 	}
+	
+	
+	public Metodo getMain(){
+		
+		for(Metodo m : metodos.values()){
+			
+			
+			if( (m.getNombre().equals("main"))
+					&& (m.getParametros().size()==0) 
+					&& (m.getForma().equals("static")) 
+					&& (m.getTipoRetorno() instanceof TipoVoid) ){
+					
+						return m;	
+						
+			}
+			
+			
+		}
+		
+		return null;
+		
+	}
+	
 	
 
 	
@@ -220,43 +248,81 @@ public class Clase {
 	
 	private void actualizarTablasHerencias() throws ErrorSemantico{
 		
+		
 		if(!nombre.equals("Object") && !consolidada){
 			
 				Clase clasePadre=TablaDeSimbolos.getTablaDeSimbolos().getClases().get(hereda.getLexema());
-				clasePadre.actualizarTablasHerencias();
+				
+				clasePadre.actualizarTablasHerencias(); //LLAMADA RECURSIVA
 			
+				
+				//ACTUALIZACION DE LOS METODOS
 				for(Metodo heredado: clasePadre.getMetodos().values()){
 					
+							
 							Metodo redefinido= metodos.get(heredado.getNombre()); 
 				
-							if(redefinido!=null)
+							if(redefinido!=null){
+								
 									heredado.puedeSobreEscribirse(redefinido);
+									
+									if(redefinido.isDynamic())
+										redefinido.setOffset(heredado.getOffset()); //SE LE SETEA EL MISMO OFFSET DEL PADRE
+									
+							}
 							else
-									metodos.put(heredado.getNombre(), heredado);
+									metodos.put(heredado.getNombre(), heredado); //NO HACE FALTA PONER OFFSET YA LE QUEDA EL DEL PADRE
+							
 				}
 				
+				//COMIENZO DE LA ASIGNACION DE LOS OFFSET DE LOS METODOS PROPIOS
+				int proximoOffset = clasePadre.getMetodosDinamicos().size(); 
 				
+				for(Metodo miMetodo : metodos.values()){		
+					 
+					 if(miMetodo.isDynamic() && !miMetodo.isOffsetAsigned()){
+						 miMetodo.setOffset(proximoOffset);
+						 proximoOffset++;
+					 }
+					 
+				 }
+				
+				
+				
+				//ACTUALIZACION DE LOS ATRIBUTOS
 				for(String claveHeredado :clasePadre.getAtributos().keySet()){
+					
 				
 						Atributo heredado = clasePadre.getAtributos().get(claveHeredado);
 						
-						if(heredado.getVisibilidad().equals("public")){
+						//SE HERERAN TODOS LOS ATRIBUTOS AUNQUE SEAN PRIVADOS EN LA CLASE PADRE
 							
-							if(claveHeredado.contains("super.")){
-								//No hace nada porque se esta soobreescribiendo un atributo en la clase padre
+						 if(atributos.get(claveHeredado)==null)
+								
+							 atributos.put(claveHeredado, heredado); 	
+						else
+							 atributos.put(clasePadre.getNombre()+"-"+claveHeredado, heredado);
 						
-							}else if(atributos.get(claveHeredado)==null){
-								atributos.put(claveHeredado, heredado);
-							}else
-								atributos.put("super."+claveHeredado, heredado);
-						}	
+							
 				}
-					
+				
+				
+				 int proximoOffsetAtrib = clasePadre.getAtributos().values().size()+1; //mas 1 para dejar la direccion 0 a la VT
+				
+				//COMIENZO DE LA ASIGNACION DE LOS OFFSET DE LOS ATRIBUTOS PROPIOS
+				 for(Atributo miAtributo : atributos.values()){
+					 
+					 if(!miAtributo.isOffsetAsigned()){
+						 miAtributo.setOffset(proximoOffsetAtrib);
+						 proximoOffsetAtrib++;
+					 }
+				 }
 
 		}
 		
 		
 		consolidada=true;
+		
 	}
 	
 	
@@ -280,18 +346,100 @@ public class Clase {
 				if (nombre.equals("Object")) 
 				return;
 				
-		if(!nombre.equals("System"))
-		constructor.controlSentencia(this);
+			if(!nombre.equals("System"))
+					constructor.controlSentencia(this);
 		
-		
-		for(Metodo metodo : metodos.values()){
+					for(Metodo metodo : metodos.values()){
 			
-				if(!metodo.isChequeado()){
-					metodo.controlSentencia(this);
-					metodo.setChequeado(true);
+						if(!metodo.isChequeado()){
+							
+								metodo.controlSentencia(this);
+								metodo.setChequeado(true);
+						}
+					}
+	
+	}
+	
+	
+	
+	
+	public List<Metodo> getMetodosDinamicos() {
+		List<Metodo> listaMetodos;
+		listaMetodos = new LinkedList<Metodo>();
+		
+		for (Metodo met : this.metodos.values()){ 
+			
+				if (met.isDynamic()) 
+						listaMetodos.add(met);
+		}	
+		
+		return listaMetodos;		
+	}
+	
+	
+	
+	
+	public void generarCodigo () {
+		
+		// Reservo espacio en la región de datos para la VT de la clase en la sección de datos.
+		Generador.getGenerador().data();
+		
+		Generador.getGenerador().encabezadoMet("VT_"+ nombre );
+			
+		
+		List<Metodo> listaDeMetodosDinamicos = getMetodosDinamicos();
+		
+		int cantDinamicos = listaDeMetodosDinamicos.size();
+		
+		Metodo [] metodosOrdenados = new Metodo[cantDinamicos]; //ARREGLO DE METODOS DINAMICOS ORDENADOS POR SU OFFSET
+		
+
+		for (int i = 0; i < cantDinamicos; i++) 
+						
+				metodosOrdenados[listaDeMetodosDinamicos.get(i).getOffset()] = listaDeMetodosDinamicos.get(i); 
+		
+		
+		
+		// HAGO EL DW DE LOS METODOS DE LA VT
+		if (metodosOrdenados.length == 0) 	// SI NO HAY METODOS DINAMICOS
+										
+				Generador.getGenerador().gen("NOP","# No realizo ninguna operación");
+		
+		else 
+				for (int i = 0; i < metodosOrdenados.length; i++) 
+					
+					Generador.getGenerador().gen("DW "+ metodosOrdenados[i].getEtiqueta(),
+												 "# Reservo espacio para el método " + metodosOrdenados[i].getNombre());
+			
+	
+		
+		// Procedo a generar la sección de código del constructor y de cada uno de los métodos: dinámico o estático.
+		Generador.getGenerador().code();
+		
+		
+		// Procedo a generar la sección de código del constructor.
+		
+		Generador.getGenerador().encabezadoMet("constructor_"+this.nombre);
+		this.constructor.generarCodigo();
+		
+		////////////////////////////////////////////////////////////// 
+		 
+
+		for (Metodo met : this.metodos.values()) {
+			
+				if (!met.isGenerado()) {
+						Generador.getGenerador().encabezadoMet(met.getEtiqueta());
+						met.generarCodigo();
 				}
 		}
-		}
+		
+		
+		
+	
+	}
+	
+	
+	
 		
 		
 	}

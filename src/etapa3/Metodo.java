@@ -7,6 +7,7 @@ import java.util.Map;
 import Excepciones.ErrorSemantico;
 import etapa1.Token;
 import etapa4.Bloque;
+import etapa5.Generador;
 
 
 
@@ -14,28 +15,33 @@ import etapa4.Bloque;
 
 
 public class Metodo {
+	private String nombreClase;
 	private String nombre;
 	private String forma;
 	private Tipo tipoRetorno;
 	private Map<String, Parametro> params;
-	//private Map<String,Variable> varLocales;
 	private int linea;
 	private Bloque bloque;
 	private boolean isChequeado;
+	private int offset;
+	private boolean isGenerado;
+	private int offsetDeRetorno;
 	
 	
-	public Metodo(Token t, String forma, Tipo tipoRetorno) {
+	public Metodo(Token t, String forma, Tipo tipoRetorno,String nombreClase) {
 		
 		nombre = t.getLexema();
 		linea = t.getNroLinea();
 		params = new HashMap<String, Parametro>();
 		
-		//varLocales = new HashMap<String, Variable>();
 		this.forma = forma;
 		this.tipoRetorno = tipoRetorno;
 		this.bloque = new Bloque();
 		isChequeado = false;
+		this.nombreClase = nombreClase;
 		
+		offset = -1; //indica que no tiene offset asignado.
+		isGenerado = false;
 	}
 	
 
@@ -59,11 +65,6 @@ public class Metodo {
 		return params;
 	}
 	
-	/*
-	public Map<String, Variable> getVariablesLocales() {
-		return this.varLocales;
-	}
-	*/
 	
 	
 	public boolean isDynamic() {
@@ -91,6 +92,44 @@ public class Metodo {
 		this.isChequeado = isChequeado;
 	}
 
+	
+	
+	public int getOffset() {
+		return offset;
+	}
+
+
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+	
+	public boolean isOffsetAsigned(){
+		return offset != -1;
+	}
+
+	
+	
+
+	public boolean isGenerado() {
+		return isGenerado;
+	}
+
+
+	public void setGenerado(boolean isGenerado) {
+		this.isGenerado = isGenerado;
+	}
+	
+	
+
+	public int getOffsetDeRetorno() {
+		return offsetDeRetorno;
+	}
+
+
+	public void setOffsetDeRetorno(int offsetDeRetorno) {
+		this.offsetDeRetorno = offsetDeRetorno;
+	}
+
 
 	public Parametro getParametro(int indice){
 		
@@ -116,19 +155,13 @@ public class Metodo {
 					p.getLinea()+"]");
 	}
 	
-		/*
-	public void insertarVariable(Variable v) throws ErrorSemantico{
-		
-		if(!params.containsKey(v.getNombre()) && !varLocales.containsKey(v.getNombre()))
-				varLocales.put(v.getNombre(), v);
-		
-		else
-			throw new ErrorSemantico(v.getLinea()+" : ya existe una variable o un parametro con el mismo nombre \""+v.getNombre()+"\""+" en el metodo \""+this.nombre+"\""
-					+"\n\n[Error:"+v.getNombre()+"|"+
-					v.getLinea()+"]");
-			
+	
+	public String getEtiqueta() {
+		return nombre +"_en_"+ nombreClase;
 	}
-	 */
+	
+	
+		
 	
 	
 	public void controlDeclaracion() throws ErrorSemantico{
@@ -197,51 +230,78 @@ public class Metodo {
 	
 	public void controlSentencia(Clase clase) throws ErrorSemantico{
 		
-	/*	
-	if(! (clase.getNombre().equals("System")) ){	
-		
-		for (Variable variable : this.varLocales.values()) {
-			
-			if (variable.getTipo() instanceof TipoClase){
-					
-				if(TablaDeSimbolos.getTablaDeSimbolos().getClases().get(variable.getTipo().getNombre())==null){
-					
-						throw new ErrorSemantico(variable.getLinea()+" : la clase \""+variable.getTipo().getNombre()+"\" no fue declarada"
-								+"\n\n[Error:"+variable.getTipo().getNombre()+"|"+
-								variable.getLinea()+"]");
-					}
-			}
-		}
-		
-		if(!clase.getNombre().equals(this.getNombre())) //chequeo que no sea el constructor
-				if(!(this.tipoRetorno instanceof TipoVoid) && !(bloque.tieneRetorno()))
-						throw new ErrorSemantico(this.getLinea()+" : el metodo \""+this.getNombre()+"\" deberia retornar un tipo \""+tipoRetorno.getNombre()+"\""
-								+"\n\n[Error:"+this.getNombre()+"|"+
-								this.getLinea()+"]");
-		
-	}
-		*/		
-		
-	/*	
-	if(! (clase.getNombre().equals("System")) )	
-		if(clase.getNombre().equals(this.getNombre())) // si es el constructor
-			if(bloque.tieneRetorno())
-					throw new ErrorSemantico(this.getLinea()+" : el contructor de la clase \""+this.getNombre()+"\" no debe retornar ningun valor"
-							+"\n\n[Error:"+this.getNombre()+"|"+
-							this.getLinea()+"]");
-		*/
-		
-		
 		bloque.controlSentencias(clase,this);
-	
-		
-		
+			
 		
 	}
 	
 	
 	
 	
+	public void generarCodigo(){
+		
+		// ASOCIO LA NUEVA UNIDAD A GENERAR
+		Generador.getGenerador().setMetodoActualAGenerar(this);
+		
+
+		//COMPUTO EL OFFSET PARA UBICACION DE RETORNO.
+		calcularOffsetDeRetorno();
+		
+		Generador.getGenerador().gen("LOADFP", "# Guardo el ED: dirección base del RA de la unidad llamadora.");
+		Generador.getGenerador().gen("LOADSP", "# Apilo la dirección base del RA de la unidad llamada.");
+		Generador.getGenerador().gen("STOREFP", "# Actualizo el FP (frame pointer) con el tope de la pila.");
+		
+		
+		// Procedo a generar el código del bloque del método en cuestión, reiniciando el conteo de vars locales generadas por método.		
+		Generador.getGenerador().nuevoConteoVarLocalesGeneradas();
+		
+		bloque.generarCodigo();
+		
+		
+		
+		// Genero el código para la terminación de la ejecución de la instancia activa asociada al RA antes creado.
+		Generador.getGenerador().gen("STOREFP", "# Recupero la dirección base del RA llamador (uso el ED)");
+		
+		
+		// Procedo a liberar el espacio ocupado por los parámetros (de las variables locales se encarga el bloque).
+		if (this.isStatic()) 
+			// Si el método en cuestión es estático, debo considerar entonces que no tengo 'this' al momento de liberar espacio.
+			Generador.getGenerador().gen("RET " + this.params.size(), "# Retorno: libero " +  this.params.size() + " espacios");	
+		else 
+			// Si el método en cuestión es dinámico, debo considerar el 'this' al momento de liberar espacio.
+			Generador.getGenerador().gen("RET " + ( this.params.size() + 1), "# Retorno: libero " + ( this.params.size() + 1) + " espacios");
+				
+		
+		
+		
+		
+		
+		
+		
+		// Marco al método como generado.
+		 
+		this.setGenerado(true);
+	}
+	
+	
+	/**
+	 * calcularOffsetDeRetorno: permite computar el valor de offset requerido sobre el RA de la unidad para acceder al retorno.
+	 */
+	public void calcularOffsetDeRetorno () {
+		
+		if (!(this.tipoRetorno instanceof TipoVoid)) {
+		
+			if (this.isDynamic()) {
+				offsetDeRetorno = 3 + params.size() + 1;
+			}
+			else {
+				offsetDeRetorno = 2 + params.size() + 1;
+			}	
+		}
+		// Si el tipo de retorno es void, no debo considerar espacio adicional para el retorno, entonces asigno 0.
+		else offsetDeRetorno = 0;
+			
+	}
 	
 	
 }

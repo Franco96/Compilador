@@ -34,5 +34,11 @@ public class AccesoThis extends Acceso{
 		
 	}
 
+	@Override
+	public void generarCodigo() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 }

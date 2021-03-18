@@ -44,5 +44,12 @@ public class AccesoParentizado extends Acceso{
 			
 	}
 
+
+	@Override
+	public void generarCodigo() {
+		
+		
+	}
+
 	
 }

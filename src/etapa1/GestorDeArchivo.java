@@ -52,7 +52,10 @@ public class GestorDeArchivo {
 	}
 	
 	
-	
+	public void cerrarArchivo() throws IOException{
+		
+		archivo.close();
+	}
 	
 	
 	

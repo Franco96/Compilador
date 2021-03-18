@@ -6,6 +6,7 @@ import etapa3.Metodo;
 import etapa3.Tipo;
 import etapa3.TipoBoolean;
 import etapa3.TipoInt;
+import etapa5.Generador;
 
 public class ExpresionUnaria extends Expresion{
 
@@ -63,8 +64,32 @@ public class ExpresionUnaria extends Expresion{
 		}
 	
 	}
+
+
+	@Override
+	public void generarCodigo() {
+		
+		operando.generarCodigo();
+		
+		
+		if(operador!=null){
+			
+				switch (operador.getLexema()) {
+
+					case "-":
+							Generador.getGenerador().gen("NEG", "# Aplico el operador negativo (-) sobre el valor del tope de la pila");
+							break;
+					case "+":
+							Generador.getGenerador().gen("NOP", "# Aplico el operador positivo (+) sobre el valor del tope de la pila (redundante)");
+							break;
+					case "!":
+							Generador.getGenerador().gen("NOT", "# Aplico el operador de negación lógica sobre el valor del tope de la pila");
+							break;
+				}
+				
+		}
+
 	
-	
-	
+	}
 	
 }

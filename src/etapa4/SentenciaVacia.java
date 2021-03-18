@@ -15,4 +15,9 @@ public class SentenciaVacia extends Sentencia{
 		
 	}
 
+	@Override
+	public void generarCodigo() {
+		
+	}
+
 }

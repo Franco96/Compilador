@@ -30,6 +30,13 @@ public class SentenciaWhile extends Sentencia{
 		cuerpoWhile.controlSentencia(clase, metodo);
 		
 	}
+
+
+	@Override
+	public void generarCodigo() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 	

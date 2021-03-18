@@ -6,6 +6,8 @@ import etapa3.Clase;
 import etapa3.Metodo;
 import etapa3.TablaDeSimbolos;
 import etapa3.Tipo;
+import etapa3.TipoVoid;
+import etapa5.Generador;
 
 public class AccesoEstatico extends Acceso{
 	
@@ -76,8 +78,44 @@ public class AccesoEstatico extends Acceso{
 		
 		
 	}
+
+	@Override
+	public void generarCodigo(){
+		
+				Clase claseEstatica = TablaDeSimbolos.getTablaDeSimbolos().getClases().get(t.getLexema());
+				Metodo met = claseEstatica.getMetodos().get(this.actMet.getNombre());
+		
+		
+				Tipo tipoRetorno = met.getTipoRetorno();
+			
+				
+				
+				
+				
+					// Si el método en cuestión NO es void...
+					if ( !(tipoRetorno instanceof TipoVoid)) {
+						
+						Generador.getGenerador().gen("RMEM 1", "# Reservo espacio para el valor de retorno del método");
+					
+					}
+					// Llevo a cabo la generación de código para los parámetros efectivos.
+					for (int i = 0; i < met.getParametros().size(); i++) {
+						// Al generar un parámetro actual correspondiente, obtendré en el tope de la pila su valor.
+						actMet.getArgumentosActuales().get(i).generarCodigo();;
+					}
+					
+					Generador.getGenerador().gen("PUSH " + met.getEtiqueta(), "# Apilo etiqueta del método en el tope de la pila");
+					Generador.getGenerador().gen("CALL", "# Aplico la llamada al método para proceder a la ejecución de su código");
+				
+				}
+				// Si tengo un encadenado, procedo a generar su correspondiente código.
+				//generarEncadenado();
+				
+		
+		
+	}
 	
 	
 	
 
-}
+

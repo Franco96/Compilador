@@ -19,6 +19,9 @@ public class SentenciaAsignacion extends Sentencia{
 		this.tipoAsignacio = tipoAsignacio;
 		this.ladoIzq = ladoIzq;
 		this.ladoDer = ladoDer;
+		
+		ladoIzq.setEsLadoIzquierdo(true);
+		
 	}
 
 
@@ -84,6 +87,17 @@ public class SentenciaAsignacion extends Sentencia{
 		}else{
 			return obtenerUltimoEncadenado(encadenado.getSiguiente());
 		}
+		
+	}
+
+
+
+	@Override
+	public void generarCodigo() {
+		
+				// Procedo a efectuar la generación del lado derecho, seguida de la correspondiente al izquierdo.
+				ladoDer.generarCodigo();
+				ladoIzq.generarCodigo();	
 		
 	}
 	

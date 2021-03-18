@@ -10,5 +10,7 @@ public abstract class Sentencia{
 	
 	
 	public abstract void controlSentencia(Clase clase,Metodo metodo) throws ErrorSemantico;
+	
+	public abstract void generarCodigo();
 
 }

@@ -11,7 +11,9 @@ import etapa3.Parametro;
 import etapa3.TablaDeSimbolos;
 import etapa3.TipoClase;
 import etapa3.Variable;
+import etapa5.Generador;
 import Excepciones.ErrorSemantico;
+
 
 
 
@@ -149,5 +151,19 @@ public class Bloque {
 	}
 
 	
+	
+	public void generarCodigo(){
+		
+		for(Sentencia sentencia : sentencias)
+			
+			sentencia.generarCodigo();
+		
+		
+		//Libero Espacio de vars locales que fueron declaradas dentro de este bloque (necesariamente estarán en la lista).
+		Generador.getGenerador().gen("FMEM " + this.varLocales.size(), "# Limpio las variables locales de este bloque");
+		Generador.getGenerador().restarVarsLocalesDisponibles(this.varLocales.size());
+		
+		
+	}
 	
 }

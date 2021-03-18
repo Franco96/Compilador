@@ -29,4 +29,6 @@ public abstract class Expresion {
 	}
 
 	public abstract Tipo chequear(Clase clase,Metodo metodo) throws ErrorSemantico;
+	
+	public abstract void generarCodigo();
 }
