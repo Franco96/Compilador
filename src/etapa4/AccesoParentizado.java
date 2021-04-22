@@ -48,6 +48,13 @@ public class AccesoParentizado extends Acceso{
 	@Override
 	public void generarCodigo() {
 		
+		expresion.generarCodigo();
+		
+		if(this.encadenado!=null){
+			if(this.esLadoIzquierdo)
+				encadenado.setLadoIzquierdo(true);
+			encadenado.generarCodigo();
+		}
 		
 	}
 

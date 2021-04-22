@@ -24,12 +24,18 @@ public class Generador {
 	
 	private int contEtiquetasDeStrings;
 	
+	private int contEtiquetasDeIf;
+	
+	private int contEtiquetasDeWhile;
+	
 	
 	
 	private Generador(){
 		
 		instruccionesCeivm = new LinkedList<String>();
-		
+		contEtiquetasDeStrings = 0;
+		contEtiquetasDeIf = 0;
+		contEtiquetasDeWhile = 0;
 		
 	}
 	
@@ -147,6 +153,19 @@ public class Generador {
 	
 	}
 	
+	public int nuevaEtiquetaDeIf () {
+		
+		int nuevaEtiqueta = contEtiquetasDeIf;
+		contEtiquetasDeIf++;
+		return nuevaEtiqueta;
+	}
+	
+	public int nuevaEtiquetaDeWhile () {
+		
+		int nuevaEtiqueta = contEtiquetasDeWhile;
+		contEtiquetasDeWhile++;
+		return nuevaEtiqueta;
+	}
 	
 	
 	

@@ -6,8 +6,10 @@ import etapa3.Clase;
 import etapa3.Metodo;
 import etapa3.Tipo;
 import etapa3.TipoClase;
+import etapa5.Generador;
 
 public class AccesoThis extends Acceso{
+	
 
 	public AccesoThis(Token t) {
 		super(t);
@@ -23,11 +25,13 @@ public class AccesoThis extends Acceso{
 		
 		
 		
-		if(this.encadenado!=null)
+		if(this.encadenado!=null){
 			
-			return encadenado.chequear(clase,metodo);
-		else
-			return new TipoClase(new Token("idClase",clase.getNombre() , t.getNroLinea()));
+				encadenado.setSeguidoDeThis(true);
+			
+				return encadenado.chequear(clase,metodo);
+		}else
+				return new TipoClase(new Token("idClase",clase.getNombre() , t.getNroLinea()));
 		
 		
 		
@@ -36,7 +40,17 @@ public class AccesoThis extends Acceso{
 
 	@Override
 	public void generarCodigo() {
-		// TODO Auto-generated method stub
+		
+		
+		// Caergo la tercer componente del RA actual en la pila.
+				Generador.getGenerador().gen("LOAD 3", "# Cargo referencia al CIR de this (de rutina activa) en el tope de la pila");
+				
+		if(this.encadenado!=null){
+				if(this.esLadoIzquierdo)
+					encadenado.setLadoIzquierdo(true);
+			encadenado.generarCodigo();
+		}
+		
 		
 	}
 

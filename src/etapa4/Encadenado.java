@@ -11,10 +11,12 @@ public abstract class Encadenado {
 	protected Encadenado siguiente;
 	protected Token token;
 	protected boolean ladoIzquierdo;
+	protected boolean seguidoDeThis;
 	
 	public Encadenado(Token token){
 		this.token = token;
 		this.ladoIzquierdo = false;
+		this.seguidoDeThis = false;
 	}
 	
 	public Encadenado getSiguiente() {
@@ -42,6 +44,16 @@ public abstract class Encadenado {
 
 	public void setLadoIzquierdo(boolean ladoIzquierdo) {
 		this.ladoIzquierdo = ladoIzquierdo;
+	}
+	
+	
+
+	public boolean isSeguidoDeThis() {
+		return seguidoDeThis;
+	}
+
+	public void setSeguidoDeThis(boolean seguidoDeThis) {
+		this.seguidoDeThis = seguidoDeThis;
 	}
 
 	public Encadenado getUltimoDelEncadenado(){

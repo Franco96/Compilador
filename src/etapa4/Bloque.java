@@ -21,11 +21,13 @@ public class Bloque {
 	
 	private List<Sentencia> sentencias;
 	private Map<String,Variable> varLocales;
+	private List<String> varsDeMiBloquePadre;
 	
 
 	public Bloque() {
 		sentencias = new LinkedList<Sentencia>();
 		varLocales = new HashMap<String, Variable>();
+		varsDeMiBloquePadre = new LinkedList<String>();
 	}
 	
 	
@@ -52,10 +54,11 @@ public class Bloque {
 	
 	public void pasarVarDelBloquePadre(Bloque bloquePadre){
 		
-			for(Variable v : bloquePadre.getVariablesLocales().values())
-		
-						this.varLocales.put(v.getNombre(), v);
-	
+			for(Variable v : bloquePadre.getVariablesLocales().values()){
+						
+				this.varLocales.put(v.getNombre(), v);
+				this.varsDeMiBloquePadre.add(v.getNombre());
+			}
 		
 	}
 	
@@ -153,6 +156,7 @@ public class Bloque {
 	
 	
 	public void generarCodigo(){
+			
 		
 		for(Sentencia sentencia : sentencias)
 			
@@ -160,9 +164,31 @@ public class Bloque {
 		
 		
 		//Libero Espacio de vars locales que fueron declaradas dentro de este bloque (necesariamente estarán en la lista).
-		Generador.getGenerador().gen("FMEM " + this.varLocales.size(), "# Limpio las variables locales de este bloque");
+		Generador.getGenerador().gen("FMEM " + this.cantVarLocalesALimpiar(), "# Limpio las variables locales de este bloque");
 		Generador.getGenerador().restarVarsLocalesDisponibles(this.varLocales.size());
 		
+		
+	}
+	
+	
+	
+	private int cantVarLocalesALimpiar(){
+		
+		
+		int cantALimpiar = 0;
+		
+		
+		for(Variable varLocal : this.varLocales.values() )
+			
+			if(!this.varsDeMiBloquePadre.contains(varLocal.getNombre()))
+				cantALimpiar++;
+			
+			
+		
+		
+		
+		
+	return cantALimpiar;
 		
 	}
 	

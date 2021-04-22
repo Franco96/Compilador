@@ -107,6 +107,10 @@ public class AccesoMetodo extends Acceso{
 	@Override
 	public void generarCodigo() {
 		
+		
+		if(metodoConvocado.isDynamic()){
+		
+		
 				
 					Generador.getGenerador().gen("LOAD 3", "# Cargo referencia al CIR de this (RA actual) en el tope de la pila");
 					
@@ -135,7 +139,36 @@ public class AccesoMetodo extends Acceso{
 				
 					
 					
+		}else {
 			
+			
+			if ( !(metodoConvocado.getTipoRetorno() instanceof TipoVoid) ) 
+				Generador.getGenerador().gen("RMEM 1", "# Reservo espacio para el valor de retorno del método");
+			
+			
+			
+			
+			
+			for (int i = 0; i < metodoConvocado.getParametros().size(); i++) 
+				
+				this.argumentos.get(i).generarCodigo();
+				
+			
+			
+			
+			
+			Generador.getGenerador().gen("PUSH " + metodoConvocado.getEtiqueta(),
+											 "# Apilo etiqueta del método en el tope de la pila");
+			Generador.getGenerador().gen("CALL", "# Aplico la llamada al método para proceder a la ejecución de su código");
+		
+		}
+					
+					
+					
+					
+					
+					
+					
 				
 			if(this.encadenado!=null){
 				if(esLadoIzquierdo)

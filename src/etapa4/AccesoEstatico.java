@@ -107,9 +107,16 @@ public class AccesoEstatico extends Acceso{
 					Generador.getGenerador().gen("PUSH " + met.getEtiqueta(), "# Apilo etiqueta del método en el tope de la pila");
 					Generador.getGenerador().gen("CALL", "# Aplico la llamada al método para proceder a la ejecución de su código");
 				
+					
+					
+					if(this.encadenado!=null){
+						if(this.esLadoIzquierdo)
+							encadenado.setLadoIzquierdo(true);
+						encadenado.generarCodigo();
+					}
+					
 				}
-				// Si tengo un encadenado, procedo a generar su correspondiente código.
-				//generarEncadenado();
+				
 				
 		
 		

@@ -3,7 +3,6 @@ package etapa3;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import Excepciones.ErrorSemantico;
 import etapa1.Token;
 import etapa4.Bloque;
@@ -246,6 +245,8 @@ public class Metodo {
 
 		//COMPUTO EL OFFSET PARA UBICACION DE RETORNO.
 		calcularOffsetDeRetorno();
+		//COMPUTO EL OFFSET PARA LOS PARAMETROS.
+		calcularOffsetDeParametros();
 		
 		Generador.getGenerador().gen("LOADFP", "# Guardo el ED: dirección base del RA de la unidad llamadora.");
 		Generador.getGenerador().gen("LOADSP", "# Apilo la dirección base del RA de la unidad llamada.");
@@ -302,6 +303,23 @@ public class Metodo {
 		else offsetDeRetorno = 0;
 			
 	}
+	
+	private void calcularOffsetDeParametros() {
+		
+		
+		for(int i = 0;i<params.size() ;i++ ){
+			
+			
+			if(this.isStatic())
+				getParametro(i).setOffset(2+params.size()-i);
+			else
+				getParametro(i).setOffset(3+params.size()-i);
+			
+		}
+				
+		
+	}		
+	
 	
 	
 }

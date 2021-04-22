@@ -43,5 +43,11 @@ public abstract class Var {
 		return offset != -1;
 	}
 	
+	
+	public Token getToken(){
+		
+		return this.k;
+	}
+	
 
 }

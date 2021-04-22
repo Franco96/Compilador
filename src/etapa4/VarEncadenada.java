@@ -34,7 +34,7 @@ public class VarEncadenada extends Encadenado{
 					linea+"]");
 		
 		
-		if(atributoEnca.getVisibilidad().equals("private"))
+		if(atributoEnca.getVisibilidad().equals("private") && !this.seguidoDeThis)
 			throw new ErrorSemantico(linea+" : el atributo con el nombre \""+nombreAtribLlamada+"\""+" "
 					+ "definido en la clase \""+clase.getNombre()+"\" debe ser publico"
 					+"\n\n[Error:"+nombreAtribLlamada+"|"+

@@ -848,9 +848,8 @@ public class AnalizadorSintactico {
 						
 						return new Literal(token);
 						
-		}else //if(Arrays.asList("T_This","idMetVar","T_Static","T_New","T_parenIni").contains(tokenActual.getToken())){
-						
-						
+		}else 
+								
 						return acceso();
 						
 

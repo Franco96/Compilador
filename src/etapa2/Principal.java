@@ -2,8 +2,6 @@ package etapa2;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
 import Excepciones.ErrorLexico;
 import Excepciones.ErrorSemantico;
 import Excepciones.ErrorSintactico;
@@ -29,7 +27,8 @@ public class Principal {
 							//Vacia la tabla de simbolos por si de ejecucion en ejecucion del main no se vacia
 							TablaDeSimbolos.getTablaDeSimbolos().limpiar(); 
 			
-							gestorDeFuente = new GestorDeArchivo("C:/Users/franc/OneDrive/Escritorio/archivos.java");
+							gestorDeFuente = new GestorDeArchivo("C:/Users/franc/OneDrive/Escritorio/Compiladores/Entregas/Lautaro-Carranza-Etapa5/"
+														+ "TEST/SentenciaLlamada/AccesoStatico/Test_0.java");
 			
 							AnalizadorLexico anlex = new AnalizadorLexico(gestorDeFuente);
 		
@@ -46,6 +45,7 @@ public class Principal {
 							
 							
 							System.out.println("Compilacion Exitosa\n\n[SinErrores]");
+							
 							
 							gestorDeFuente.cerrarArchivo();
 							
@@ -66,21 +66,7 @@ public class Principal {
 	}
 	
 
-	static Metodo [] obtenerMetodosOrdenador(List<Metodo> lista){
-		
-		int cantMetodos = lista.size();
 	
-		Metodo [] metodos = new Metodo[cantMetodos]; 
-		
-		
-		for(Metodo m : lista){
-			
-			metodos[m.getOffset()] = m;
-		}
-		
-		
-		return metodos;
-	}
 	
 }
 

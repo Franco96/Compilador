@@ -29,8 +29,8 @@ public class SentenciaBloque extends Sentencia{
 
 	@Override
 	public void generarCodigo() {
-		// TODO Auto-generated method stub
-		
+	
+		b.generarCodigo();
 	}
 
 	
