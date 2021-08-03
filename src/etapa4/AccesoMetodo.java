@@ -162,13 +162,11 @@ public class AccesoMetodo extends Acceso{
 			Generador.getGenerador().gen("CALL", "# Aplico la llamada al método para proceder a la ejecución de su código");
 		
 		}
+		
 					
 					
 					
-					
-					
-					
-					
+						
 				
 			if(this.encadenado!=null){
 				if(esLadoIzquierdo)

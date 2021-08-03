@@ -28,7 +28,7 @@ public class Principal {
 							TablaDeSimbolos.getTablaDeSimbolos().limpiar(); 
 			
 							gestorDeFuente = new GestorDeArchivo("C:/Users/franc/OneDrive/Escritorio/Compiladores/Entregas/Lautaro-Carranza-Etapa5/"
-														+ "TEST/SentenciaLlamada/AccesoStatico/Test_0.java");
+														+ "TEST/SentenciaLlamada/AccesoVariable/Test_1.java");
 			
 							AnalizadorLexico anlex = new AnalizadorLexico(gestorDeFuente);
 		

@@ -170,6 +170,7 @@ public class Generador {
 	
 	
 	public void generarSalida(String nombreArchivoSalida) throws IOException {
+		
 		BufferedWriter escritorArchivo;
 		int cantSentencias;
 		int index;
@@ -177,6 +178,8 @@ public class Generador {
 		cantSentencias = instruccionesCeivm.size();
 		// Si uso un archivo particular (no salida estándar), limpio su contenido.
 		escritorArchivo.flush();		
+		
+		
 		//Cree el nuevo archivo, escribo todas las sentencias
 		for (index = 0; index < cantSentencias; index++) {
 			// Escribo al final del archivo una nueva linea de código generado, seguido de un ENTER.

@@ -2,8 +2,10 @@ package etapa3;
 
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import Excepciones.ErrorSemantico;
 import etapa1.Token;
 import etapa4.Bloque;
@@ -157,7 +159,10 @@ public class TablaDeSimbolos {
 	
 	public void generarCodigo(String nombreArchivo) throws IOException{
 		
-		Generador.getGenerador().comentario("<<INICIO SECCIÓN DE CÓDIGO>>");
+		Date hoy = new Date();
+		
+		Generador.getGenerador().comentario("Franco Lautaro Carranza");
+		Generador.getGenerador().comentario("Fecha de generacion: "+hoy);
 		Generador.getGenerador().saltoDeLinea();
 		Generador.getGenerador().code();
 		Generador.getGenerador().gen("PUSH "+getMain().getEtiqueta(), "# recupero la etiqueta del metodo main");
@@ -168,7 +173,8 @@ public class TablaDeSimbolos {
 		Generador.getGenerador().saltoDeLinea();
 		
 		Generador.getGenerador().comentario("Rutina para la gestion del heap");
-		// Generacion del codigo de la rutina para la gestion del heap provista por la catedra
+		
+		// Generacion del codigo de la rutina para la gestion del heap
 		Generador.getGenerador().encabezadoMet("simple_malloc");
 		Generador.getGenerador().gen("LOADFP", "");
 		Generador.getGenerador().gen("LOADSP", "");

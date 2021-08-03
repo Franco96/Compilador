@@ -1,8 +1,9 @@
-# <<INICIO SECCIÓN DE CÓDIGO>>
+# Franco Lautaro Carranza
+# Fecha de generacion: Tue Jul 27 14:44:53 ART 2021
 
 
 .CODE
-                    PUSH main_en_A      # recupero la etiqueta del metodo main
+                    PUSH main_en_Principal          # recupero la etiqueta del metodo main
                     CALL                # Realizo la llamada a main, usando la referencia a este en el tope de la pila
                     HALT                # Finalizo la ejecución
 
@@ -27,7 +28,7 @@ simple_malloc:
 .DATA
 
 VT_A:
-                    NOP                 # No realizo ninguna operación
+                    DW inicializarVar_en_A          # Reservo espacio para el método inicializarVar
 
 .CODE
 
@@ -39,51 +40,50 @@ constructor_A:
                     STOREFP             # Recupero la dirección base del RA llamador (uso el ED)
                     RET 1               # Retorno: libero 1 espacios
 
-obtenerFormula_en_A:
+inicializarVar_en_A:
                     LOADFP              # Guardo el ED: dirección base del RA de la unidad llamadora.
                     LOADSP              # Apilo la dirección base del RA de la unidad llamada.
                     STOREFP             # Actualizo el FP (frame pointer) con el tope de la pila.
-                    RMEM 3              # Reservo espacio para las variables declaradas
-                    LOAD 5              # Cargo el valor de variable/parámetro en el tope de la pila
-                    PUSH 10             # Apilo el valor del literal entero '10'
-                    ADD                 
-                    STORE 0             # Almaceno el valor del tope de la pila en variable/parámetro
-                    LOAD 4              # Cargo el valor de variable/parámetro en el tope de la pila
-                    PUSH 10             # Apilo el valor del literal entero '10'
-                    ADD                 
-                    STORE -1            # Almaceno el valor del tope de la pila en variable/parámetro
-                    LOAD 3              # Cargo el valor de variable/parámetro en el tope de la pila
-                    PUSH 10             # Apilo el valor del literal entero '10'
-                    ADD                 
-                    STORE -2            # Almaceno el valor del tope de la pila en variable/parámetro
-                    LOAD 0              # Cargo el valor de variable/parámetro en el tope de la pila
-                    LOAD -1             # Cargo el valor de variable/parámetro en el tope de la pila
-                    LOAD -2             # Cargo el valor de variable/parámetro en el tope de la pila
-                    ADD                 
-                    ADD                 
-                    STORE 6             # Almaceno en la componente de retorno el valor del tope de la pila
-                    FMEM 3              # Elimino espacio empleado por variables locales hasta este punto
-                    STOREFP             # Recupero la dirección base del RA llamador (uso el ED)
-                    RET 3               # Retorno: libero 3 espacios
-                    FMEM 3              # Limpio las variables locales de este bloque
-                    STOREFP             # Recupero la dirección base del RA llamador (uso el ED)
-                    RET 3               # Retorno: libero 3 espacios
-
-main_en_A:
-                    LOADFP              # Guardo el ED: dirección base del RA de la unidad llamadora.
-                    LOADSP              # Apilo la dirección base del RA de la unidad llamada.
-                    STOREFP             # Actualizo el FP (frame pointer) con el tope de la pila.
-                    RMEM 1              # Reservo espacio para el valor de retorno del método
-                    PUSH 15             # Apilo el valor del literal entero '15'
-                    PUSH 15             # Apilo el valor del literal entero '15'
-                    PUSH 15             # Apilo el valor del literal entero '15'
-                    PUSH obtenerFormula_en_A          # Apilo etiqueta del método en el tope de la pila
-                    CALL                # Aplico la llamada al método para proceder a la ejecución de su código
-                    PUSH printIln_en_System          # Apilo etiqueta del método en el tope de la pila
-                    CALL                # Aplico la llamada al método para proceder a la ejecución de su código
+                    .DATA               # Continuación de la sección de datos para un nuevo String
+                    string_0: DW "hola soy a y me utilizan mis decendientes",0          # Defino una etiqueta para un nuevo literal String
+                    .CODE               # Continuación de la sección de código para un nuevo String
+                    PUSH string_0       # Apilo la etiqueta ligada al nuevo literal String
+                    LOAD 3              # Cargo referencia al CIR de this (de rutina activa) en el tope de la pila
+                    SWAP                # Intercambio el valor del parámetro actual por el de this en el tope de la pila
+                    STOREREF 1          # Almaceno el valor del tope de la pila en el atributo
                     FMEM 0              # Limpio las variables locales de este bloque
                     STOREFP             # Recupero la dirección base del RA llamador (uso el ED)
-                    RET 0               # Retorno: libero 0 espacios
+                    RET 1               # Retorno: libero 1 espacios
+
+.DATA
+
+VT_B:
+                    DW inicializarVar_en_A          # Reservo espacio para el método inicializarVar
+
+.CODE
+
+constructor_B:
+                    LOADFP              # Guardo el ED: dirección base del RA de la unidad llamadora.
+                    LOADSP              # Apilo la dirección base del RA de la unidad llamada.
+                    STOREFP             # Actualizo el FP (frame pointer) con el tope de la pila.
+                    FMEM 0              # Limpio las variables locales de este bloque
+                    STOREFP             # Recupero la dirección base del RA llamador (uso el ED)
+                    RET 1               # Retorno: libero 1 espacios
+
+.DATA
+
+VT_C:
+                    DW inicializarVar_en_A          # Reservo espacio para el método inicializarVar
+
+.CODE
+
+constructor_C:
+                    LOADFP              # Guardo el ED: dirección base del RA de la unidad llamadora.
+                    LOADSP              # Apilo la dirección base del RA de la unidad llamada.
+                    STOREFP             # Actualizo el FP (frame pointer) con el tope de la pila.
+                    FMEM 0              # Limpio las variables locales de este bloque
+                    STOREFP             # Recupero la dirección base del RA llamador (uso el ED)
+                    RET 1               # Retorno: libero 1 espacios
 
 .DATA
 
@@ -207,3 +207,47 @@ printBln_en_System:
                     PRNLN               # Imprimo el salto de linea
                     STOREFP             # Recupero la dirección base del RA llamador (uso el ED)
                     RET 1               # Retorno: libero 1 espacios
+
+.DATA
+
+VT_Principal:
+                    NOP                 # No realizo ninguna operación
+
+.CODE
+
+constructor_Principal:
+                    LOADFP              # Guardo el ED: dirección base del RA de la unidad llamadora.
+                    LOADSP              # Apilo la dirección base del RA de la unidad llamada.
+                    STOREFP             # Actualizo el FP (frame pointer) con el tope de la pila.
+                    FMEM 0              # Limpio las variables locales de este bloque
+                    STOREFP             # Recupero la dirección base del RA llamador (uso el ED)
+                    RET 1               # Retorno: libero 1 espacios
+
+main_en_Principal:
+                    LOADFP              # Guardo el ED: dirección base del RA de la unidad llamadora.
+                    LOADSP              # Apilo la dirección base del RA de la unidad llamada.
+                    STOREFP             # Actualizo el FP (frame pointer) con el tope de la pila.
+                    RMEM 1              # Reservo espacio para las variables declaradas
+                    RMEM 1              # Reservo espacio para la nueva instancia en el RA
+                    PUSH 2              # Apilo cantidad de espacio requerido por CIR para atributos y VT
+                    PUSH simple_malloc  # Apilo la etiqueta de malloc para proceder a la reserva de espacio
+                    CALL                # Aplico llamada a malloc. Reservo 2espacios para nuevo CIR
+                    DUP                 # Duplico el tope: queda la referencia a la nueva instancia (CIR) en el tope
+                    PUSH VT_C           # Apilo en el tope la etiqueta de la VT de la clase
+                    STOREREF 0          # Almaceno la etiqueta de la VT como primera componente del CIR
+                    DUP                 # Duplico la referencia al nuevo CIR para trabajar sobre su doble
+                    PUSH constructor_C  # Apilo etiqueta del constructor en el tope de la pila
+                    CALL                # Aplico la llamada al constructor para proceder a la ejecución de su código
+                    STORE 0             # Almaceno el valor del tope de la pila en variable/parámetro
+                    LOAD 0              # Cargo el valor de variable/parámetro en el tope de la pila
+                    DUP                 # Duplico la referencia al nuevo CIR para trabajar sobre su doble
+                    LOADREF 0           # Apilo la referencia a la VT del this en el tope de la pila
+                    LOADREF 0           # Apilo la referencia al método a ser invocado en el tope de la pila
+                    CALL                # Aplico la llamada al método para proceder a la ejecución de su código
+                    LOAD 0              # Cargo el valor de variable/parámetro en el tope de la pila
+                    LOADREF 1           # Apilo el valor del atributo del CIR, que es referenciado en el tope
+                    PUSH printSln_en_System          # Apilo etiqueta del método en el tope de la pila
+                    CALL                # Aplico la llamada al método para proceder a la ejecución de su código
+                    FMEM 1              # Limpio las variables locales de este bloque
+                    STOREFP             # Recupero la dirección base del RA llamador (uso el ED)
+                    RET 0               # Retorno: libero 0 espacios
